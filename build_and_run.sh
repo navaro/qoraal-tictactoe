@@ -3,4 +3,4 @@ cd build
 cmake ..
 cmake --build .
 cd ..
-./build/test/tictactoe
+./build/src/tictactoe
