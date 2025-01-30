@@ -28,6 +28,8 @@ endif()
 target_compile_options(tictactoe PRIVATE -O0 -g)
 target_compile_options(qoraal PRIVATE -O0 -g)
 target_compile_options(qoraal-http PRIVATE -O0 -g)
+target_compile_options(qoraal-flash PRIVATE -O0 -g)
+target_compile_options(qoraal-engine PRIVATE -O0 -g)
 
 # Define CFG_OS_MEM_DEBUG_ENABLE for qoraal
 target_compile_definitions(qoraal PUBLIC CFG_OS_POSIX)
