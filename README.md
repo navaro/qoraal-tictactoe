@@ -27,12 +27,19 @@ It’s just down the hall, to the right.
 
 ### Follow me...
 
+<br>
+
 </div>
 
+<div align="center">
+  <img src="welcome.png" alt="Welcome" />
+</div>
 
+<br>
+<br>
 
 ```
-decl_name       "simple html test"
+decl_name       "welcome to my page"
 decl_version    1
 
 statemachine html_test {
