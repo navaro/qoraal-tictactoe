@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2015-2023, Navaro, All Rights Reserved
+    Copyright (C) 2015-2025, Navaro, All Rights Reserved
     SPDX-License-Identifier: MIT
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
