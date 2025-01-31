@@ -26,7 +26,7 @@ statemachine html_test {
                                 "<style>\r\n"
                                 "    body {\r\n"
                                 "        font-family: Arial, sans-serif;\r\n"
-                                "        background-color: #FAF7F5;\r\n"
+                                "        background: radial-gradient(circle, #1e1e2e 0%, #0c0917 90%);\r\n"
                                 "        color: #333;\r\n"
                                 "        display: flex;\r\n"
                                 "        flex-direction: column;\r\n"
