@@ -23,12 +23,12 @@
 
 
 
-
 #ifndef __HTML_H__
 #define __HTML_H__
 
 
 #include <stdint.h>
+#include <stdbool.h>
 #include "qoraal/os.h"
 
 
@@ -60,8 +60,8 @@ typedef struct HTML_EMIT_S {
 extern "C" {
 #endif
 
-    int32_t     html_emit_create (HTML_EMIT_T* emit, HTML_EMIT_CB cb, void * ctx) ;
-    int32_t     html_emit_wait (HTML_EMIT_T* emit, uint32_t timeout) ;
+    bool        html_emit_ready (void) ;
+    int32_t     html_emit_wait (HTML_EMIT_T* emit, HTML_EMIT_CB cb, void * ctx, uint32_t timeout) ;
 
 #ifdef __cplusplus
 }

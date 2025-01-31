@@ -80,11 +80,11 @@ wengine_handler (HTTP_USER_T *user, uint32_t method, char* endpoint)
     }
 
     const char * filename = cmd[0] ;
-    if (!filename)  filename = "simple.e" ;
+    if (!filename)  filename = "welcome.e" ;
 
     if (method == HTTP_HEADER_METHOD_GET) {
 
-        if (engine_machine_load (filename,0, 0)) {
+        if (engine_machine_start (filename,0, 0, true, false) || !html_emit_ready()) {
             httpserver_write_response (user, WSERVER_RESP_CODE_400, HTTP_SERVER_CONTENT_TYPE_HTML,
                 0, 0, WSERVER_RESP_CONTENT_400, strlen(WSERVER_RESP_CONTENT_400)) ;
 
@@ -99,11 +99,7 @@ wengine_handler (HTTP_USER_T *user, uint32_t method, char* endpoint)
         }
 
         HTML_EMIT_T emit ;
-        html_emit_create (&emit, html_emit_cb, user) ;
-
-        engine_machine_run () ;
-
-        html_emit_wait (&emit, 4000) ;
+        html_emit_wait (&emit, html_emit_cb, user, 4000) ;
         engine_machine_stop () ;
         return httpserver_chunked_complete (user) ;
 

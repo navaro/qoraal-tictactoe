@@ -59,8 +59,7 @@ extern "C" {
     extern int32_t      engine_service_ctrl (uint32_t code, uintptr_t arg) ;
     extern int32_t      engine_service_run (uintptr_t arg) ;
 
-    extern int32_t      engine_machine_load (const char *filename, void* ctx, STARTER_OUT_FP log_cb) ;
-    extern int32_t      engine_machine_run (void) ;
+    extern int32_t      engine_machine_start (const char *filename, void* ctx, STARTER_OUT_FP log_cb, bool start, bool verbose) ;
     extern void         engine_machine_stop (void) ;
 
 #ifdef __cplusplus

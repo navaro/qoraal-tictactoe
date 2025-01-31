@@ -42,10 +42,12 @@
 /*===========================================================================*/
 
 static int32_t  qshell_cmd_run (SVC_SHELL_IF_T * pif, char** argv, int argc) ;
+static int32_t  qshell_cmd_compile (SVC_SHELL_IF_T * pif, char** argv, int argc) ;
 static int32_t  qshell_cmd_list (SVC_SHELL_IF_T * pif, char** argv, int argc) ;
 
 SVC_SHELL_CMD_LIST_START(engine, QORAAL_SERVICE_ENGINE)
 SVC_SHELL_CMD_LIST("run", qshell_cmd_run, "<filename>")
+SVC_SHELL_CMD_LIST("run", qshell_cmd_compile, "<filename>")
 SVC_SHELL_CMD_LIST("list", qshell_cmd_list, "<filename>")
 SVC_SHELL_CMD_LIST_END()
 
@@ -106,8 +108,9 @@ engine_service_ctrl (uint32_t code, uintptr_t arg)
 
 
 int32_t
-engine_machine_load (const char *filename, void* ctx, STARTER_OUT_FP log_cb)
+engine_machine_start (const char *filename, void* ctx, STARTER_OUT_FP log_cb, bool start, bool verbose)
 {
+    int32_t res ;
     /*
     * Read the Machine Definition File specified on the command line.
     */
@@ -140,25 +143,19 @@ engine_machine_load (const char *filename, void* ctx, STARTER_OUT_FP log_cb)
      */
     starter_stop();
     starter_init(0);
-    int32_t res = starter_load (buffer, sz, ctx, log_cb, 0);
+    if (start) {
+        res = starter_start (buffer, sz, ctx, log_cb, verbose);
+        if (res) {
+            starter_stop ();
+
+        }
+
+    } else {
+        res = starter_compile (buffer, sz, ctx, log_cb, verbose) ;
+
+    }
+
     qoraal_free (QORAAL_HeapAuxiliary, buffer);
-
-    if (res) {
-        starter_stop ();
-        return res;
-    }
-
-    return EOK;
-}
-
-int32_t
-engine_machine_run (void)
-{
-    int32_t res = starter_start ();
-
-    if (res) {
-        starter_stop ();
-    }
 
     return res;
 }
@@ -188,12 +185,9 @@ qshell_cmd_run(SVC_SHELL_IF_T *pif, char **argv, int argc)
         return SVC_SHELL_CMD_E_PARMS;
     }
 
-    int32_t res = engine_machine_load(argv[1], pif, starter_out);
+    int32_t res = engine_machine_start (argv[1], pif, starter_out, true, false);
 
     switch (res) {
-    case EOK:
-        res = engine_machine_run();
-        break;  
     case E_NOTFOUND:
         svc_shell_print(pif, SVC_SHELL_OUT_STD,
                         "terminal failure: unable to open file \"%s\" for read.\r\n", argv[1]);
@@ -216,6 +210,41 @@ qshell_cmd_run(SVC_SHELL_IF_T *pif, char **argv, int argc)
     }
 
     return res == EOK ? SVC_SHELL_CMD_E_OK : res;
+}
+
+int32_t
+qshell_cmd_compile (SVC_SHELL_IF_T *pif, char **argv, int argc)
+{
+    if (argc < 2) {
+        return SVC_SHELL_CMD_E_PARMS;
+    }
+
+    int32_t res = engine_machine_start (argv[1], pif, starter_out, false, argc > 2);
+
+    switch (res) {
+    case E_NOTFOUND:
+        svc_shell_print(pif, SVC_SHELL_OUT_STD,
+                        "terminal failure: unable to open file \"%s\" for read.\r\n", argv[1]);
+        break;
+    case E_NOMEM:
+        svc_shell_print(pif, SVC_SHELL_OUT_STD,
+                        "terminal failure: out of memory.\r\n");
+        break;
+    case E_FILE:
+        svc_shell_print(pif, SVC_SHELL_OUT_STD,
+                        "terminal failure: unable to read file \"%s\".\r\n", argv[1]);
+        break;
+    default:
+        if (res != EOK) {
+            svc_shell_print(pif, SVC_SHELL_OUT_STD,
+                            "compiling \"%s\" failed with %d\r\n\r\n",
+                            argv[1], (int)res);
+        }
+        break;
+    }
+
+    return res == EOK ? SVC_SHELL_CMD_E_OK : res;
+
 }
 
 static void

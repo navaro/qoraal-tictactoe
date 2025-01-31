@@ -27,18 +27,16 @@
 #include "qoraal-engine/engine.h"
 #include "html.h"
 
-#define USE_MUTEX       0
-static HTML_EMIT_T *       _html_emit  = 0 ;
-#if USE_MUTEX
-static p_mutex_t           _html_mutex = 0 ;
-#endif
+static HTML_EMIT_T *        _html_emit  = 0 ;
+static p_mutex_t            _html_mutex = 0 ;
+uint32_t                    _html_event_mask = 0 ;
 
 /*===========================================================================*/
 /* part local functions.                                                */
 /*===========================================================================*/
 static int32_t      part_html_cmd (PENGINE_T instance, uint32_t start) ;
 static int32_t      action_html_emit (PENGINE_T instance, uint32_t parm, uint32_t flags) ;
-static int32_t      action_html_done (PENGINE_T instance, uint32_t parm, uint32_t flags) ;
+static int32_t      action_html_ready (PENGINE_T instance, uint32_t parm, uint32_t flags) ;
 
 
 
@@ -47,13 +45,13 @@ static int32_t      action_html_done (PENGINE_T instance, uint32_t parm, uint32_
  *
  */
 ENGINE_ACTION_IMPL  (html_emit,        "Emits html text.") ;
-ENGINE_ACTION_IMPL  (html_done,        "Completes html text.") ;
+ENGINE_ACTION_IMPL  (html_ready,        "Completes html text / ready to render.") ;
 
 /**
  * @brief   Initialises events for part
  *
  */
-ENGINE_EVENT_IMPL   ( _html_start,     "Toaster smoke alert event.") ;
+ENGINE_EVENT_IMPL   ( _html_render,     "Render content with html_emit and finally html_done.") ;
 
 /**
  * @brief   Initialises constants for part
@@ -69,31 +67,43 @@ ENGINE_CONST_IMPL(0, STOP,                   "Stop");
  */
 ENGINE_CMD_FP_IMPL (part_html_cmd) ;
 
-int32_t 
-html_emit_wait (HTML_EMIT_T* emit, uint32_t timeout)
+bool        
+html_emit_ready (void)
 {
-    int32_t res = os_sem_wait_timeout (&emit->complete, timeout) ;
-#if USE_MUTEX
-    os_mutex_lock (_html_mutex) ;
-#endif
-    os_sem_delete (&emit->complete) ;
-    _html_emit = 0 ;
-#if USE_MUTEX
-    os_mutex_unlock (_html_mutex) ;
-#endif
-    return res ;
+    return _html_event_mask != 0 ;
 }
 
 int32_t 
-html_emit_create (HTML_EMIT_T* emit, HTML_EMIT_CB cb, void * ctx)
+html_emit_wait (HTML_EMIT_T* emit, HTML_EMIT_CB cb, void * ctx, uint32_t timeout)
 {
+    if (!_html_event_mask) return E_UNEXP ;
+
     if (os_sem_create (&emit->complete, 0) != EOK) {
         return EFAIL ;
     }
     emit->cb = cb ;
     emit->ctx = ctx ;
     _html_emit = emit ;
-    return EOK ;
+
+   os_mutex_lock (&_html_mutex) ;
+    if (engine_queue_masked_event (_html_event_mask, ENGINE_EVENT_ID_GET(_html_render), 0) != EOK) {
+        timeout = 0 ;
+
+    } else {
+         _html_event_mask = 0 ;
+
+    }
+    os_mutex_unlock (&_html_mutex) ;
+
+    int32_t res = os_sem_wait_timeout (&emit->complete, OS_MS2TICKS(timeout)) ;
+
+    os_mutex_lock (&_html_mutex) ;
+    if (_html_emit) {
+        os_sem_delete (&emit->complete) ;
+        _html_emit = 0 ;
+    }
+    os_mutex_unlock (&_html_mutex) ;
+    return res ;
 }
 
 
@@ -106,13 +116,13 @@ html_emit_create (HTML_EMIT_T* emit, HTML_EMIT_CB cb, void * ctx)
 int32_t
 part_html_cmd (PENGINE_T instance, uint32_t start)
 {
-#if USE_MUTEX    
-    if (start == PART_CMD_PARM_START) {
-        return os_mutex_create (&_html_mutex) ;
-    } else {        
-        os_mutex_delete (&_html_mutex) ;
-    }
-#endif
+    if (!instance) {
+        if (start == PART_CMD_PARM_START) {
+            return os_mutex_create (&_html_mutex) ;
+        } else {        
+            os_mutex_delete (&_html_mutex) ;
+        }
+    }   
     return ENGINE_OK ;
 }
 
@@ -135,15 +145,11 @@ action_html_emit (PENGINE_T instance, uint32_t parm, uint32_t flags)
         str = engine_get_string (instance, parm, &len) ;
     } 
 
-#if USE_MUTEX
-    os_mutex_lock (_html_mutex) ;
-#endif
+    os_mutex_lock (&_html_mutex) ;
     if (str && _html_emit && _html_emit->cb) {
         _html_emit->cb (_html_emit->ctx, str, len) ;
     }
-#if USE_MUTEX    
-    os_mutex_unlock (_html_mutex) ;
-#endif
+    os_mutex_unlock (&_html_mutex) ;
 
     return ENGINE_OK ;
 }
@@ -155,22 +161,19 @@ action_html_emit (PENGINE_T instance, uint32_t parm, uint32_t flags)
  * @param[in] flags         validate and parameter type flag.
  */
 int32_t
-action_html_done (PENGINE_T instance, uint32_t parm, uint32_t flags)
+action_html_ready (PENGINE_T instance, uint32_t parm, uint32_t flags)
 {
     if (flags & (PART_ACTION_FLAG_VALIDATE)) {
         return EOK ;
 
     }
 
-#if USE_MUTEX
-    os_mutex_lock (_html_mutex) ;
-#endif
+    os_mutex_lock (&_html_mutex) ;
+    _html_event_mask |= engine_get_mask (instance) ;
     if (_html_emit && _html_emit->complete) {
        os_sem_signal (&_html_emit->complete) ;
     }
-#if USE_MUTEX    
-    os_mutex_unlock (_html_mutex) ;
-#endif
+    os_mutex_unlock (&_html_mutex) ;
 
     return ENGINE_OK ;
 }
