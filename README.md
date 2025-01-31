@@ -1,16 +1,20 @@
+<div align="center">
+
 # qoraal-tictactoe
+
+<div align="left">
 
 
 ### This Is What It All Was For
 
 <div align="center">
 
-### You finally arrived.
+#### __You finally arrived.__
 
 ##### I was beginning to wonder if you would.  
-It’s nice to make your acquaintance—  
-though I feel as though I’ve known you before,  
-or perhaps I only dreamed it.
+It’s nice to meet you—  
+though I feel I’ve known you before.  
+Perhaps I only dreamed it?
 
 </div>
 
@@ -25,9 +29,10 @@ It’s just down the hall, to the right.
 
 <div align="center">
 
+
 ### Follow me...
 
-<br>
+<br><br>
 
 </div>
 
