@@ -39,19 +39,23 @@ It’s just down the hall, to the right.
 <br>
 
 ```
-decl_name       "welcome to my page"
+decl_name       "Welcome to My Page"
 decl_version    1
 
 statemachine html_test {
 
-    startstate html_head
+    startstate ready
+
+    state ready {
+        enter (html_ready)
+        event (_html_render, html_head)
+
+    }
 
     state html {
-        enter (html_emit,   ""
-                            "<!DOCTYPE html>\r\n"
-                            "<html lang=\"en\">\r\n")
-        exit (html_emit,    ""
-                            "</html>\r\n")
+        enter (html_emit,       "<!DOCTYPE html>\r\n"
+                                "<html lang=\"en\">\r\n")
+        exit (html_emit,        "</html>\r\n")
     }
 
     super html {
@@ -87,14 +91,11 @@ statemachine html_test {
                                 "<h1>Welcome to My Page</h1>\r\n"
                                 "<p>This is a simple message to brighten your day!</p>\r\n")
             exit (html_emit,    "</body>")
-            event (_state_start, done)
+            event (_state_start, ready)
 
         }
     }
 
-    state done {
-        enter (html_done)
 
-    }
 }
 ```
