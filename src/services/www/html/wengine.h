@@ -53,7 +53,7 @@ extern "C" {
 #endif
 
 int32_t         wengine_handler (HTTP_USER_T *user, uint32_t method, char* endpoint) ;
-const char*     wengine_metadata (HTTP_USER_T *user, uint32_t method, char* endpoint, uint32_t type) ;
+const char*     wengine_ctrl (HTTP_USER_T *user, uint32_t method, char* endpoint, uint32_t type) ;
 
 #ifdef __cplusplus
 }

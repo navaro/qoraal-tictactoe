@@ -26,10 +26,20 @@
 #include "qoraal-engine/parts/parts.h"
 #include "qoraal-engine/engine.h"
 #include "html.h"
-
+#define USE_MUTEX           1
 static HTML_EMIT_T *        _html_emit  = 0 ;
+#if USE_MUTEX
 static p_mutex_t            _html_mutex = 0 ;
+#endif
 uint32_t                    _html_event_mask = 0 ;
+
+#if USE_MUTEX
+#define MUTEX_LOCK()    os_mutex_lock (&_html_mutex) ;  
+#define MUTEX_UNLOCK()  os_mutex_unlock (&_html_mutex) ;
+#else
+#define MUTEX_LOCK()
+#define MUTEX_UNLOCK()
+#endif
 
 /*===========================================================================*/
 /* part local functions.                                                */
@@ -74,18 +84,48 @@ html_emit_ready (void)
 }
 
 int32_t 
+html_emit_create (HTML_EMIT_T* emit)
+{
+    if (os_bsem_create (&emit->complete, 1) != EOK) {
+        return EFAIL ;
+    }
+    if (os_sem_create (&emit->lock, 1) != EOK) {
+        os_bsem_delete (&emit->complete) ;
+        return EFAIL ;
+    }
+
+     return EOK ;
+}
+
+void 
+html_emit_delete (HTML_EMIT_T* emit)
+{
+    os_bsem_delete (&emit->complete) ;
+    os_sem_delete (&emit->lock) ;
+}
+
+int32_t 
+html_emit_lock (HTML_EMIT_T* emit, uint32_t timeout)
+{
+    return os_sem_wait_timeout (&emit->lock, OS_MS2TICKS(timeout)) ;
+}
+
+void 
+html_emit_unlock (HTML_EMIT_T* emit)
+{
+    os_sem_signal (&emit->lock) ;
+}
+
+int32_t 
 html_emit_wait (HTML_EMIT_T* emit, HTML_EMIT_CB cb, void * ctx, uint32_t timeout)
 {
     if (!_html_event_mask) return E_UNEXP ;
 
-    if (os_sem_create (&emit->complete, 0) != EOK) {
-        return EFAIL ;
-    }
     emit->cb = cb ;
     emit->ctx = ctx ;
     _html_emit = emit ;
 
-   os_mutex_lock (&_html_mutex) ;
+   MUTEX_LOCK () ;
     if (engine_queue_masked_event (_html_event_mask, ENGINE_EVENT_ID_GET(_html_render), 0) != EOK) {
         timeout = 0 ;
 
@@ -93,16 +133,15 @@ html_emit_wait (HTML_EMIT_T* emit, HTML_EMIT_CB cb, void * ctx, uint32_t timeout
          _html_event_mask = 0 ;
 
     }
-    os_mutex_unlock (&_html_mutex) ;
+    MUTEX_UNLOCK () ;
 
     int32_t res = os_sem_wait_timeout (&emit->complete, OS_MS2TICKS(timeout)) ;
 
-    os_mutex_lock (&_html_mutex) ;
+    MUTEX_LOCK () ;
     if (_html_emit) {
-        os_sem_delete (&emit->complete) ;
         _html_emit = 0 ;
     }
-    os_mutex_unlock (&_html_mutex) ;
+    MUTEX_UNLOCK () ;
     return res ;
 }
 
@@ -116,6 +155,7 @@ html_emit_wait (HTML_EMIT_T* emit, HTML_EMIT_CB cb, void * ctx, uint32_t timeout
 int32_t
 part_html_cmd (PENGINE_T instance, uint32_t start)
 {
+#if USE_MUTEX
     if (!instance) {
         if (start == PART_CMD_PARM_START) {
             return os_mutex_create (&_html_mutex) ;
@@ -123,6 +163,7 @@ part_html_cmd (PENGINE_T instance, uint32_t start)
             os_mutex_delete (&_html_mutex) ;
         }
     }   
+#endif
     return ENGINE_OK ;
 }
 
@@ -145,11 +186,11 @@ action_html_emit (PENGINE_T instance, uint32_t parm, uint32_t flags)
         str = engine_get_string (instance, parm, &len) ;
     } 
 
-    os_mutex_lock (&_html_mutex) ;
+    MUTEX_LOCK () ;
     if (str && _html_emit && _html_emit->cb) {
         _html_emit->cb (_html_emit->ctx, str, len) ;
     }
-    os_mutex_unlock (&_html_mutex) ;
+    MUTEX_UNLOCK () ;
 
     return ENGINE_OK ;
 }
@@ -168,12 +209,12 @@ action_html_ready (PENGINE_T instance, uint32_t parm, uint32_t flags)
 
     }
 
-    os_mutex_lock (&_html_mutex) ;
+    MUTEX_LOCK () ;
     _html_event_mask |= engine_get_mask (instance) ;
     if (_html_emit && _html_emit->complete) {
        os_sem_signal (&_html_emit->complete) ;
     }
-    os_mutex_unlock (&_html_mutex) ;
+    MUTEX_UNLOCK () ;
 
     return ENGINE_OK ;
 }

@@ -49,6 +49,7 @@ typedef void (*HTML_EMIT_CB)(void* /*ctx*/, const char* /*html*/, uint32_t /*len
 typedef struct HTML_EMIT_S {
     HTML_EMIT_CB            cb ;
     void *                  ctx ;
+    p_sem_t                 lock ;
     p_sem_t                 complete ;
 } HTML_EMIT_T ;
 
@@ -59,6 +60,11 @@ typedef struct HTML_EMIT_S {
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+    int32_t     html_emit_create (HTML_EMIT_T* emit) ;
+    void        html_emit_delete (HTML_EMIT_T* emit) ;
+    int32_t     html_emit_lock (HTML_EMIT_T* emit, uint32_t timeout) ;
+    void        html_emit_unlock (HTML_EMIT_T* emit) ;
 
     bool        html_emit_ready (void) ;
     int32_t     html_emit_wait (HTML_EMIT_T* emit, HTML_EMIT_CB cb, void * ctx, uint32_t timeout) ;

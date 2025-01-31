@@ -34,12 +34,12 @@
 #define WSERVER_ABOUT_TEXT      "Qoraal About"
 
 const char*
-wabout_metadata (HTTP_USER_T *user, uint32_t method, char* endpoint, uint32_t type)
+wabout_ctrl (HTTP_USER_T *user, uint32_t method, char* endpoint, uint32_t type)
 {
-    if (type == WSERVER_METADATA_TYPE_HEADING) {
+    if (type == WSERVER_CTRL_METADATA_HEADING) {
         return "About" ;
     }
-    if (type == WSERVER_METADATA_TYPE_HEADERS) {
+    if (type == WSERVER_CTRL_METADATA_HEADERS) {
 
         char* groupname = strchr (endpoint, '/') ;
         if (groupname++) {
