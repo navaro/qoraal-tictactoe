@@ -14,7 +14,7 @@
 ##### I was beginning to wonder if you would.  
 It’s nice to make your acquaintance—  
 though I feel I’ve known you before.  
-Perhaps I only dreamed it?
+Perhaps it was only a dream.
 
 </div>
 
@@ -30,7 +30,7 @@ It’s just down the hall, to the right.
 <div align="center">
 
 
-### Follow me...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+### Follow me!&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
 <br><br>
 

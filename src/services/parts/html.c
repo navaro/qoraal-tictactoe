@@ -54,21 +54,21 @@ static int32_t      action_html_ready (PENGINE_T instance, uint32_t parm, uint32
  * @brief   Initializes actions for part
  *
  */
-ENGINE_ACTION_IMPL  (html_emit,        "Emits html text.") ;
+ENGINE_ACTION_IMPL  (html_emit,         "Emits html text.") ;
 ENGINE_ACTION_IMPL  (html_ready,        "Completes html text / ready to render.") ;
 
 /**
  * @brief   Initialises events for part
  *
  */
-ENGINE_EVENT_IMPL   ( _html_render,     "Render content with html_emit and finally html_done.") ;
+ENGINE_EVENT_IMPL   ( _html_render,     "Render content with html_emit and finally html_ready again.") ;
 
 /**
  * @brief   Initialises constants for part
  *
  */
-ENGINE_CONST_IMPL(1, START,                  "Start");
-ENGINE_CONST_IMPL(0, STOP,                   "Stop");
+ENGINE_CONST_IMPL(1, START,             "Start");
+ENGINE_CONST_IMPL(0, STOP,              "Stop");
 
 
 /**

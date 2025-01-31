@@ -48,7 +48,7 @@ static int32_t  qshell_cmd_list (SVC_SHELL_IF_T * pif, char** argv, int argc) ;
 SVC_SHELL_CMD_LIST_START(engine, QORAAL_SERVICE_ENGINE)
 SVC_SHELL_CMD_LIST("run", qshell_cmd_run, "<filename>")
 SVC_SHELL_CMD_LIST("compile", qshell_cmd_compile, "<filename> [verbose]")
-SVC_SHELL_CMD_LIST("list", qshell_cmd_list, "<filename>")
+SVC_SHELL_CMD_LIST("list", qshell_cmd_list, "")
 SVC_SHELL_CMD_LIST_END()
 
 
