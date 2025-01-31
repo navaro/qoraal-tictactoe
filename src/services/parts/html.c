@@ -26,7 +26,7 @@
 #include "qoraal-engine/parts/parts.h"
 #include "qoraal-engine/engine.h"
 #include "html.h"
-#define USE_MUTEX           1
+#define USE_MUTEX           0
 static HTML_EMIT_T *        _html_emit  = 0 ;
 #if USE_MUTEX
 static p_mutex_t            _html_mutex = 0 ;
