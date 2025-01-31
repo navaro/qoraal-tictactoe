@@ -40,12 +40,15 @@ It’s just down the hall, to the right.
   <img src="tictactoe.png" alt="Welcome" />
 </div>
 <br>
+<div align="center">
+But first, let me show you this…
 <br>
 <div align="center">
   <img src="welcome.png" alt="Welcome" />
 </div>
 <br>
 <br>
+<div align="left">
 
 ```
 decl_name       "Welcome to My Page"
