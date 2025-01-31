@@ -12,7 +12,7 @@
 #### __You finally arrived.__
 
 ##### I was beginning to wonder if you would.  
-It’s nice to meet you—  
+It’s nice to make your acquaintance—  
 though I feel I’ve known you before.  
 Perhaps I only dreamed it?
 
