@@ -32,6 +32,8 @@
 /* Client pre-compile time settings.                                         */
 /*===========================================================================*/
 
+#define ENGINE_STARTUP_MACHINE      "tictactoe.e"
+
 #define DBG_MESSAGE_SERVICES(severity, fmt_str, ...)   DBG_MESSAGE_T_LOG (SVC_LOGGER_TYPE(severity,0), 0, fmt_str, ##__VA_ARGS__)
 
 

@@ -108,6 +108,7 @@ int main( void )
      * For the demo, we wait for the shell to be exited with the "exit" command.
      */
     console_wait_for_exit () ;
+    os_thread_sleep (100) ;
     svc_service_stop_timeout (QORAAL_SERVICE_WWW, 1200) ;
     qoraal_flash_stop_default () ;
     qoraal_stop_default () ;

@@ -51,6 +51,7 @@ SVC_SHELL_CMD_LIST("compile", qshell_cmd_compile, "<filename> [verbose]")
 SVC_SHELL_CMD_LIST("list", qshell_cmd_list, "")
 SVC_SHELL_CMD_LIST_END()
 
+static void     engine_startup (void) ;
 
 /*===========================================================================*/
 /* Service Local Variables and Types                                         */
@@ -85,6 +86,7 @@ engine_service_ctrl (uint32_t code, uintptr_t arg)
 
     case SVC_SERVICE_CTRL_START: {
         SVC_SHELL_CMD_LIST_INSTALL(engine) ;
+        engine_startup () ;
         }
         break ;
 
@@ -171,11 +173,23 @@ static int32_t
 starter_out(void* ctx, uint32_t out, const char* str)
 {
     SVC_SHELL_IF_T * pif = (SVC_SHELL_IF_T *) ctx ;
-    svc_shell_print (pif, SVC_SHELL_OUT_STD, "%s", str) ;
-    size_t len = strlen(str) ;
-    if (str[len-1] != '\n') svc_shell_print (pif, SVC_SHELL_OUT_STD,  ("\r\n")) ;
+    if (pif) {
+        svc_shell_print (pif, SVC_SHELL_OUT_STD, "%s", str) ;
+        size_t len = strlen(str) ;
+        if (str[len-1] != '\n') svc_shell_print (pif, SVC_SHELL_OUT_STD,  ("\r\n")) ;
+    } else {
+        DBG_MESSAGE_ENGIE (DBG_MESSAGE_SEVERITY_REPORT, "ENG   : : %s", str) ;
+    }
 
     return 0 ;
+}
+
+static void
+engine_startup(void)
+{
+    DBG_MESSAGE_ENGIE (DBG_MESSAGE_SEVERITY_REPORT, 
+            "ENG   : : starting default machine '%s'", ENGINE_STARTUP_MACHINE) ;
+    engine_machine_start (ENGINE_STARTUP_MACHINE, 0, starter_out, true, false) ;
 }
 
 int32_t

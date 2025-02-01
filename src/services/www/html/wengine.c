@@ -68,7 +68,6 @@ wengine_ctrl (HTTP_USER_T *user, uint32_t method, char* endpoint, uint32_t type)
 int32_t
 wengine_handler (HTTP_USER_T *user, uint32_t method, char* endpoint)
 {
-
     int32_t res = HTTP_SERVER_WSERVER_E_OK ;
 
     char* cmd[5]  = {0} ;
@@ -82,9 +81,6 @@ wengine_handler (HTTP_USER_T *user, uint32_t method, char* endpoint)
 
     }
 
-    const char * filename = cmd[0] ;
-    if (!filename)  filename = "tictactoe.e" ;
-
     if (method == HTTP_HEADER_METHOD_GET) {
 
         if (html_emit_lock (&_wengine_emit, 4000) != EOK) {
@@ -93,12 +89,6 @@ wengine_handler (HTTP_USER_T *user, uint32_t method, char* endpoint)
 
         }
 
-        if (engine_machine_start (filename,0, 0, true, false) || !html_emit_ready()) {
-            html_emit_unlock (&_wengine_emit) ;
-            return httpserver_write_response (user, WSERVER_RESP_CODE_400, HTTP_SERVER_CONTENT_TYPE_HTML,
-                0, 0, WSERVER_RESP_CONTENT_400, strlen(WSERVER_RESP_CONTENT_400)) ;
-
-        }
 
         const   HTTP_HEADER_T headers[]   = { {"Cache-Control", "no-cache"} };
         if ((res = httpserver_chunked_response (user, 200, 
@@ -110,7 +100,6 @@ wengine_handler (HTTP_USER_T *user, uint32_t method, char* endpoint)
         }
 
         html_emit_wait (&_wengine_emit, html_emit_cb, user, 4000) ;
-        engine_machine_stop () ;
         res =  httpserver_chunked_complete (user) ;
         html_emit_unlock (&_wengine_emit) ;
         return res ;

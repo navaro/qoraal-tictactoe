@@ -141,7 +141,7 @@ wserver_handler_framework_start(HTTP_USER_T * user, uint32_t method, char* endpo
             "       <table><tr>\r\n"
             "           <A style=\"width:100%\" class=\"button button-primary\" href=\"/system\" >System</A><br>\r\n"
             "       </tr><tr>\r\n"
-            "           <A style=\"width:100%\" class=\"button button-primary\" href=\"/engine/tictactoe.e\" >Tic-Tac-Toe</A><br>\r\n"
+            "           <A style=\"width:100%\" class=\"button button-primary\" href=\"/engine\" >Engine</A><br>\r\n"
             "       </tr><tr>\r\n"
             "           <A style=\"width:100%\" class=\"button button-primary\" href=\"/services\" >Services</A><br>\r\n"
             "       </tr><tr>\r\n"
