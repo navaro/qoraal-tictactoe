@@ -24,6 +24,7 @@
 #include "qoraal/qoraal.h"
 #include "qoraal/svc/svc_services.h"
 #include "qoraal/svc/svc_shell.h"
+#include "qoraal-engine/engine.h"
 #include "qoraal-engine/starter.h"
 #include "services.h"
 
@@ -45,10 +46,19 @@ static int32_t  qshell_cmd_run (SVC_SHELL_IF_T * pif, char** argv, int argc) ;
 static int32_t  qshell_cmd_compile (SVC_SHELL_IF_T * pif, char** argv, int argc) ;
 static int32_t  qshell_cmd_list (SVC_SHELL_IF_T * pif, char** argv, int argc) ;
 
+
+static int32_t qshell_cmd_event (SVC_SHELL_IF_T * pif, char** argv, int argc) ;
+static int32_t qshell_cmd_trans (SVC_SHELL_IF_T * pif, char** argv, int argc) ;
+static int32_t qshell_cmd_engine_dbg (SVC_SHELL_IF_T * pif, char** argv, int argc) ;
+static int32_t qshell_cmd_engine (SVC_SHELL_IF_T * pif, char** argv, int argc) ;
+
+
 SVC_SHELL_CMD_LIST_START(engine, QORAAL_SERVICE_ENGINE)
 SVC_SHELL_CMD_LIST("run", qshell_cmd_run, "<filename>")
 SVC_SHELL_CMD_LIST("compile", qshell_cmd_compile, "<filename> [verbose]")
-SVC_SHELL_CMD_LIST("list", qshell_cmd_list, "")
+
+
+
 SVC_SHELL_CMD_LIST_END()
 
 static void     engine_startup (void) ;
@@ -259,38 +269,4 @@ qshell_cmd_compile (SVC_SHELL_IF_T *pif, char **argv, int argc)
 
     return res == EOK ? SVC_SHELL_CMD_E_OK : res;
 
-}
-
-static void
-starter_list(void* ctx, starter_list_t type, const char * name, const char* description)
-{
-    SVC_SHELL_IF_T * pif = (SVC_SHELL_IF_T *) ctx ;
-    static starter_list_t t = typeNone ;
-    if (t != type) {
-        t = type ;
-        const char * type_names[] = {"", "Actions", "Events", "Constatnts" } ;
-        svc_shell_print (pif, SVC_SHELL_OUT_STD, 
-                    "%s:\r\n", type_names[t]) ;
-
-    }
-
-    svc_shell_print (pif, SVC_SHELL_OUT_STD, "    %-24s %s\r\n", 
-                    name, description) ;
-}
-
-/**
- * @brief       qshell_cmd_run
- * @details     Outputs the version of the Qoraal shell.
- *
- * @param[in]   pif     Shell interface pointer.
- * @param[in]   argv    Command-line arguments.
- * @param[in]   argc    Number of command-line arguments.
- *
- * @return      status  The result of the command execution.
- */
-int32_t
-qshell_cmd_list (SVC_SHELL_IF_T * pif, char** argv, int argc)
-{
-    starter_parts_list (pif, starter_list) ;
-    return SVC_SHELL_CMD_E_OK ;
 }

@@ -1,135 +1,80 @@
+
+
+
 decl_name       "tic-tac-toe"
 decl_version    1
 
-
-decl_events {
-    _tick
-}
-
-
-statemachine tictactoe {
+statemachine html_test {
 
     startstate ready
 
     state ready {
         enter (html_ready)
-        action (_html_render, html_response, HTML)
         event (_html_render, html_head)
     }
 
+    // This state emits the doctype + <html> opening
     state html {
         enter (html_emit,       "<!DOCTYPE html>\r\n"
                                 "<html lang=\"en\">\r\n")
         exit (html_emit,        "</html>\r\n")
     }
 
+    // Wrap the HEAD + BODY under 'html' superstate
     super html {
+        // HEAD
         state html_head {
             enter (html_emit,   "<head>\r\n"
                                 "<meta charset=\"UTF-8\">\r\n"
                                 "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n"
                                 "<title>Tic-Tac-Toe</title>\r\n"
-                                "<link rel=\"stylesheet\" href=\"/engine/tictaccss\">\r\n")
-            exit (html_emit,    "</head>\r\n")
-            event (_state_start, html_board_cell)
-        }
-    }
-
-    super html {
-        state html_body {
-            enter (html_emit,   "<body>\r\n"
-                                "<h1>Tic-Tac-Toe</h1>\r\n")
-            exit (html_emit,    "<button class=\"restart-btn\">Restart</button>\r\n"
-                                "<button class=\"restart-btn\" onclick=\"window.location.href='/index'\">Take Me Home</button>"
-                                "</body>")
-            event (_state_start, html_board)
-        }
-        super html_body {
-            state html_board {
-                enter (html_emit,   "<div class=\"board\">\r\n")
-                exit (html_emit,    "</div>\r\n")
-                event (_state_start, ready)
-            }
-            super html_board {
-                state html_board_cell {
-                    enter (html_emit,   "    <div class=\"cell\"><a href=\"/engine/tictactoe/_html_click/1\" class=\"invisible-link\"></a></div>\r\n"
-                                        "    <div class=\"cell\"><a href=\"/engine/tictactoe/_html_click/2\" class=\"invisible-link\"></a></div>\r\n"
-                                        "    <div class=\"cell\"><a href=\"/engine/tictactoe/_html_click/3\" class=\"invisible-link\"></a></div>\r\n"
-                                        "    <div class=\"cell\"><a href=\"/engine/tictactoe/_html_click/4\" class=\"invisible-link\"></a></div>\r\n"
-                                        "    <div class=\"cell x\"></div>\r\n"
-                                        "    <div class=\"cell\"><a href=\"/engine/tictactoe/_html_click/6\" class=\"invisible-link\"></a></div>\r\n"
-                                        "    <div class=\"cell\"><a href=\"/engine/tictactoe/_html_click/7\" class=\"invisible-link\"></a></div>\r\n"
-                                        "    <div class=\"cell\"><a href=\"/engine/tictactoe/_html_click/8\" class=\"invisible-link\"></a></div>\r\n"
-                                        "    <div class=\"cell\"><a href=\"/engine/tictactoe/_html_click/9\" class=\"invisible-link\"></a></div>\r\n")
-                    event (_state_start, ready)
-                }
-        }            
-        }
-    }
-
-
-}
-
-statemachine welcome {
-
-    startstate ready
-
-    state ready {
-        enter (html_ready)
-        action (_html_render, html_response, HTML)
-        event (_html_render, html_head)
-
-    }
-
-    state html {
-        enter (html_emit,       "<!DOCTYPE html>\r\n"
-                                "<html lang=\"en\">\r\n")
-        exit (html_emit,        "</html>\r\n")
-    }
-
-    super html {
-        state html_head {
-            enter (html_emit,   "<head>"
-                                "<meta charset=\"UTF-8\">\r\n"
-                                "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n"
-                                "<title>Simple Page</title>\r\n"
-                                "<link rel=\"stylesheet\" href=\"/engine/welcomecss\">\r\n")
-            exit (html_emit,    "</head>\r\n")
+                                // reference our separate CSS
+                                "<link rel=\"stylesheet\" href=\"/engine/css\">"
+                                "\r\n"
+                                "</head>\r\n")
+            exit (html_emit,    "")
             event (_state_start, html_body)
         }
     }
 
     super html {
+        // BODY
         state html_body {
-            enter (html_emit,   "<body>"
-                                "<h1>Welcome to My Page</h1>\r\n"
-                                "<p>This is a simple message to brighten your day!</p>\r\n")
-            exit (html_emit,    "</body>")
+            enter (html_emit,   "<body>\r\n"
+                                "<h1>Tic-Tac-Toe</h1>\r\n"
+                                "<div class=\"board\">\r\n"
+                                "    <div class=\"cell\"><a href=\"/engine/_tick/1\" class=\"invisible-link\"></a></div>\r\n"
+                                "    <div class=\"cell\"><a href=\"/engine/_tick/2\" class=\"invisible-link\"></a></div>\r\n"
+                                "    <div class=\"cell\"><a href=\"/engine/_tick/3\" class=\"invisible-link\"></a></div>\r\n"
+                                "    <div class=\"cell\"><a href=\"/engine/_tick/4\" class=\"invisible-link\"></a></div>\r\n"
+                                "    <div class=\"cell x\"></div>\r\n"
+                                "    <div class=\"cell \"><a href=\"/engine/_tick/6\" class=\"invisible-link\"></a></div>\r\n"
+                                "    <div class=\"cell\"><a href=\"/engine/_tick/7\" class=\"invisible-link\"></a></div>\r\n"
+                                "    <div class=\"cell\"><a href=\"/engine/_tick/8\" class=\"invisible-link\"></a></div>\r\n"
+                                "    <div class=\"cell\"><a href=\"/engine/_tick/9\" class=\"invisible-link\"></a></div>\r\n"
+                                "</div>\r\n"
+                                "<button class=\"restart-btn\">Restart</button>\r\n"
+                                "<button class=\"restart-btn\" onclick=\"window.location.href='/index'\">Take Me Home</button>\r\n"
+                                "</body>")
+            exit (html_emit,    "")
             event (_state_start, ready)
-
         }
     }
 
-
 }
 
-statemachine tictaccss {
 
-    startstate ready
+decl_name       "css"
+decl_version    1
 
-    state ready {
-        enter (html_ready)
-        action (_html_render, html_response, CSS)
-        event (_html_render, emit_css)
-
-    }
+statemachine css_test {
 
     // Start state to emit CSS
-    state emit_css {
+    startstate emit_css {
         // If your engine supports something like (set_header, "Content-Type: text/css") do it here
         // or configure it in your route definition externally.
 
-        enter (html_emit,   ""
+        enter (html_emit,   
             "body {\r\n"
             "    display: flex;\r\n"
             "    flex-direction: column;\r\n"
@@ -245,42 +190,7 @@ statemachine tictaccss {
             "    top: 0;\r\n"
             "    left: 0;\r\n"
             "    z-index: 1;\r\n"
-            "}\r\n")
-
-            event (_state_start, ready)
-
+            "}\r\n"
+        )
     }
 }
-
-statemachine welcomecss {
-
-    startstate ready
-
-    state ready {
-        enter (html_ready)
-        action (_html_render, html_response, CSS)
-        event (_html_render, emit_css)
-
-    }
-
-    // Start state to emit CSS
-    state emit_css {
-            enter (html_emit,   "body {\r\n"
-                            "        font-family: Arial, sans-serif;\r\n"
-                            "        background: radial-gradient(circle, #1e1e2e 0%, #0c0917 90%);\r\n"
-                            "        color: #333;\r\n"
-                            "        display: flex;\r\n"
-                            "        flex-direction: column;\r\n"
-                            "        justify-content: center;\r\n"
-                            "        align-items: center;\r\n"
-                            "        height: 100vh;\r\n"
-                            "        margin: 0;\r\n"
-                            "}\r\n"
-                            "h1 {\r\n"
-                            "        color: #AD231F;\r\n"
-                            "}\r\n")
-            event (_state_start, ready)
-    }
-
-}
-

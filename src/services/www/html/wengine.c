@@ -27,21 +27,10 @@
 #include "qoraal/qoraal.h"
 #include "qoraal-http/wserver.h"
 #include "../../services.h"
-#include "../../parts/html.h"
+#include "../parts/html.h"
 
 static HTML_EMIT_T  _wengine_emit ;
 
-
-static void 
-html_emit_cb (void* ctx, const char* html, uint32_t len)
-{
-    HTTP_USER_T *user = (HTTP_USER_T *) ctx ;
-    if (user && html && len) {
-        httpserver_chunked_append_str (user, html, len) ;
-
-    }
-    
-}
 
 const char*
 wengine_ctrl (HTTP_USER_T *user, uint32_t method, char* endpoint, uint32_t type)
@@ -90,17 +79,16 @@ wengine_handler (HTTP_USER_T *user, uint32_t method, char* endpoint)
         }
 
 
-        const   HTTP_HEADER_T headers[]   = { {"Cache-Control", "no-cache"} };
-        if ((res = httpserver_chunked_response (user, 200, 
-                        HTTP_SERVER_CONTENT_TYPE_HTML, headers, 
-                        sizeof(headers)/sizeof(headers[0])) < HTTP_SERVER_E_OK)) {
-            html_emit_unlock (&_wengine_emit) ;
-            return res ;
+        res = html_emit_wait (&_wengine_emit, cmd[0], user, 4000) ;
+        if (res == E_UNEXP) {
+            res =  httpserver_write_response (user, WSERVER_RESP_CODE_404, HTTP_SERVER_CONTENT_TYPE_HTML,
+                0, 0, WSERVER_RESP_CONTENT_500, strlen(WSERVER_RESP_CONTENT_500)) ;
+
+        } else if (res = E_NOTFOUND) {  
+            res =  httpserver_write_response (user, WSERVER_RESP_CODE_404, HTTP_SERVER_CONTENT_TYPE_HTML,
+                0, 0, WSERVER_RESP_CONTENT_404, strlen(WSERVER_RESP_CONTENT_404)) ;
 
         }
-
-        html_emit_wait (&_wengine_emit, html_emit_cb, user, 4000) ;
-        res =  httpserver_chunked_complete (user) ;
         html_emit_unlock (&_wengine_emit) ;
         return res ;
 

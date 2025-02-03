@@ -29,7 +29,6 @@
 #include "qoraal/svc/svc_services.h"
 #include "qoraal/svc/svc_tasks.h"
 #include "qoraal/svc/svc_shell.h"
-#include "qoraal-flash/syslog.h"
 
 
 /*===========================================================================*/
@@ -206,8 +205,10 @@ qshell_cmd_status (SVC_SHELL_IF_T * pif, char** argv, int argc)
 void
 system_syslog_cb (void* channel, LOGGERT_TYPE_T type, uint8_t facility, const char* msg)
 {
+    #if 0
     syslog_append (SYSLOG_INFO_LOG, facility, SVC_LOGGER_GET_SEVERITY(type), msg) ;
     if (SVC_LOGGER_GET_SEVERITY(type) < SVC_LOGGER_SEVERITY_ERROR) {
         syslog_append (SYSLOG_ASSERT_LOG, facility, SVC_LOGGER_GET_SEVERITY(type), msg) ;
     }
+    #endif
 }

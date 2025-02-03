@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "qoraal/qoraal.h"
-#include "qoraal-flash/qoraal.h"
 #include "qoraal/svc/svc_services.h"
 #include "services/www/wserver_inst.h"
 #include "qoraal/example/platform.h"
@@ -19,9 +18,6 @@
 /* Service Local Variables and Types                                         */
 /*===========================================================================*/
 
-REGISTRY_INST_DECL(_system_registry, 0, 64*1024, 24, 128, 101)
-SYSLOG_INST_DECL(_system_syslog, 64*1024*2, 5, 8*1024, 3, 4*1024)
-
 
 SVC_SERVICE_LIST_START(_qoraal_services_list)
 SVC_SERVICE_RUN_DECL("shell",  console_service_run, console_service_ctrl, 0, 6000, OS_THREAD_PRIO_8, QORAAL_SERVICE_SHELL, SVC_SERVICE_FLAGS_AUTOSTART)
@@ -31,7 +27,6 @@ SVC_SERVICE_DECL("engine", engine_service_ctrl, 0, QORAAL_SERVICE_ENGINE, SVC_SE
 SVC_SERVICE_LIST_END()
 
 static const QORAAL_CFG_T           _qoraal_cfg = { .malloc = platform_malloc, .free = platform_free, .debug_print = platform_print, .debug_assert = platform_assert, .current_time = platform_current_time, .rand = platform_rand, .rand = platform_rand, .wdt_kick = platform_wdt_kick};
-static const QORAAL_FLASH_CFG_T     _qoraal_flash_cfg = { .flash_read = platform_flash_read, .flash_write = platform_flash_write, .flash_erase = platform_flash_erase};
 
 /*===========================================================================*/
 /* Local Functions                                                           */
@@ -52,7 +47,6 @@ main_thread(void* arg)
      * Lets get the thing started!
      */
     qoraal_start_default () ;
-    qoraal_flash_start_default () ;
 }
 
 /**
@@ -71,7 +65,6 @@ main_init (void)
 
     platform_init (23*1024*1024) ; // 32MB FLASH
     qoraal_init_default (&_qoraal_cfg, _qoraal_services_list) ;
-    qoraal_flash_init_default (&_qoraal_flash_cfg, &_system_registry, &_system_syslog) ;
     qoraal_http_init_default () ;
 
     svc_threads_create (&thd, 0,
@@ -108,9 +101,7 @@ int main( void )
      * For the demo, we wait for the shell to be exited with the "exit" command.
      */
     console_wait_for_exit () ;
-    os_thread_sleep (100) ;
-    svc_service_stop_timeout (QORAAL_SERVICE_WWW, 1200) ;
-    qoraal_flash_stop_default () ;
+    svc_service_stop_timeout (svc_service_get(QORAAL_SERVICE_WWW), 1200) ;
     qoraal_stop_default () ;
     platform_stop () ;
     // for( ;; ) os_thread_sleep (32768);

@@ -29,8 +29,8 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "qoraal/os.h"
-
+#include "qoraal/qoraal.h"
+#include "qoraal-http/wserver.h"
 
 /*===========================================================================*/
 /* Client constants.                                                         */
@@ -47,8 +47,8 @@
 typedef void (*HTML_EMIT_CB)(void* /*ctx*/, const char* /*html*/, uint32_t /*len*/) ;
 
 typedef struct HTML_EMIT_S {
-    HTML_EMIT_CB            cb ;
-    void *                  ctx ;
+    HTTP_USER_T *           user ;
+    int32_t                 response ;
     p_sem_t                 lock ;
     p_sem_t                 complete ;
 } HTML_EMIT_T ;
@@ -66,8 +66,7 @@ extern "C" {
     int32_t     html_emit_lock (HTML_EMIT_T* emit, uint32_t timeout) ;
     void        html_emit_unlock (HTML_EMIT_T* emit) ;
 
-    bool        html_emit_ready (void) ;
-    int32_t     html_emit_wait (HTML_EMIT_T* emit, HTML_EMIT_CB cb, void * ctx, uint32_t timeout) ;
+    int32_t     html_emit_wait (HTML_EMIT_T* emit, const char * ep, HTTP_USER_T * user, uint32_t timeout) ;
 
 #ifdef __cplusplus
 }
