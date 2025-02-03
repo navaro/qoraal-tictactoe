@@ -100,7 +100,7 @@ int main( void )
     /*
      * For the demo, we wait for the shell to be exited with the "exit" command.
      */
-    console_wait_for_exit () ;
+    console_wait_for_exit (QORAAL_SERVICE_WWW) ;
     svc_service_stop_timeout (svc_service_get(QORAAL_SERVICE_WWW), 1200) ;
     qoraal_stop_default () ;
     platform_stop () ;
