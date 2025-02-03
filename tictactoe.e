@@ -60,7 +60,7 @@ statemachine tictactoe {
                     action_eq (_state_start, 2, html_subst_emit,   "    <div class=\"cell\"><a href=\"/engine/tictactoe/_html_click/[r]\" class=\"invisible-link\"></a></div>\r\n")
                     action_eq (_state_start, 3, html_subst_emit,   "    <div class=\"cell x\"></div>\r\n")
                     action_eq (_state_start, 4, html_subst_emit,   "    <div class=\"cell o\"></div>\r\n")
-                    action (_state_start, nop-) // pop the result 
+                    action (_state_start, nop-) // pop the result
                     event_nt (_state_start, html_board_cell)
                     event_if (_state_start, ready)
                 }
