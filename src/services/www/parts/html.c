@@ -23,10 +23,13 @@
 
 
 #include <stdio.h>
+#include "qoraal/common/strsub.h"
 #include "qoraal-engine/parts/parts.h"
 #include "qoraal-engine/engine.h"
 #include "html.h"
-#define USE_MUTEX           1
+
+
+#define USE_MUTEX           0
 static HTML_EMIT_T *        _html_emit  = 0 ;
 #if USE_MUTEX
 static p_mutex_t            _html_mutex = 0 ;
@@ -47,7 +50,9 @@ uint32_t                    _html_event_mask = 0 ;
 static int32_t      part_html_cmd (PENGINE_T instance, uint32_t start) ;
 static int32_t      action_html_response (PENGINE_T instance, uint32_t parm, uint32_t flags) ;
 static int32_t      action_html_emit (PENGINE_T instance, uint32_t parm, uint32_t flags) ;
+static int32_t      action_html_subst_emit (PENGINE_T instance, uint32_t parm, uint32_t flags) ;
 static int32_t      action_html_ready (PENGINE_T instance, uint32_t parm, uint32_t flags) ;
+
 
 
 #define HTML_RESPONSE_TYPE_HTML                       0
@@ -63,6 +68,7 @@ static int32_t      action_html_ready (PENGINE_T instance, uint32_t parm, uint32
  */
 ENGINE_ACTION_IMPL  (html_response,     "Startes a response of param TEXT, HTML, CSS or JSON.") ;
 ENGINE_ACTION_IMPL  (html_emit,         "Emits html text.") ;
+ENGINE_ACTION_IMPL  (html_subst_emit,   "Emits html text after string substetution.") ;
 ENGINE_ACTION_IMPL  (html_ready,        "Completes html text / ready to render.") ;
 
 
@@ -262,8 +268,8 @@ action_html_response (PENGINE_T instance, uint32_t parm, uint32_t flags)
  * @param[in] parm          parameter.
  * @param[in] flags         validate and parameter type flag.
  */
-int32_t
-action_html_emit (PENGINE_T instance, uint32_t parm, uint32_t flags)
+static int32_t
+html_emit_text (PENGINE_T instance, uint32_t parm, uint32_t flags, bool strsub)
 {
     if (flags & (PART_ACTION_FLAG_VALIDATE)) {
         return parts_valadate_string (instance, parm, flags) ;
@@ -290,16 +296,45 @@ action_html_emit (PENGINE_T instance, uint32_t parm, uint32_t flags)
         if (flags & PART_ACTION_FLAG_STRING) {
             str = engine_get_string (instance, parm, &len) ;
 
-        } 
+        }
 
         if (str) {
+            char * newstr =  0 ;
+            if (strsub) {
+                int32_t dstlen = strsub_parse_get_dst_length (0, str, len) ;
+                if (dstlen > 0) {
+                    char * newstr = qoraal_malloc(QORAAL_HeapAuxiliary, dstlen) ;
+                    if (newstr) {
+                        len = strsub_parse_string_to (0, str, len, newstr, dstlen) ;
+                        str = newstr ;
+
+                    }
+
+                }
+
+            }
+
             httpserver_chunked_append_str (user, str, len) ;
+
+            if (newstr) qoraal_free(QORAAL_HeapAuxiliary, newstr) ;
 
         }
 
     }
 
     return ENGINE_OK ;
+}
+
+int32_t
+action_html_emit (PENGINE_T instance, uint32_t parm, uint32_t flags)
+{
+    return html_emit_text (instance, parm, flags, false) ;
+}
+
+int32_t
+action_html_subst_emit (PENGINE_T instance, uint32_t parm, uint32_t flags)
+{
+    return html_emit_text (instance, parm, flags, true) ;
 }
 
 

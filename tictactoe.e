@@ -46,22 +46,23 @@ statemachine tictactoe {
         }
         super html_body {
             state html_board {
+                enter (r_load, 0)
                 enter (html_emit,   "<div class=\"board\">\r\n")
                 exit (html_emit,    "</div>\r\n")
                 event (_state_start, ready)
             }
             super html_board {
                 state html_board_cell {
-                    enter (html_emit,   "    <div class=\"cell\"><a href=\"/engine/tictactoe/_html_click/1\" class=\"invisible-link\"></a></div>\r\n"
-                                        "    <div class=\"cell\"><a href=\"/engine/tictactoe/_html_click/2\" class=\"invisible-link\"></a></div>\r\n"
-                                        "    <div class=\"cell\"><a href=\"/engine/tictactoe/_html_click/3\" class=\"invisible-link\"></a></div>\r\n"
-                                        "    <div class=\"cell\"><a href=\"/engine/tictactoe/_html_click/4\" class=\"invisible-link\"></a></div>\r\n"
-                                        "    <div class=\"cell x\"></div>\r\n"
-                                        "    <div class=\"cell\"><a href=\"/engine/tictactoe/_html_click/6\" class=\"invisible-link\"></a></div>\r\n"
-                                        "    <div class=\"cell\"><a href=\"/engine/tictactoe/_html_click/7\" class=\"invisible-link\"></a></div>\r\n"
-                                        "    <div class=\"cell\"><a href=\"/engine/tictactoe/_html_click/8\" class=\"invisible-link\"></a></div>\r\n"
-                                        "    <div class=\"cell\"><a href=\"/engine/tictactoe/_html_click/9\" class=\"invisible-link\"></a></div>\r\n")
-                    event (_state_start, ready)
+                    enter (r_inc+, 9)
+                    action_ld (_state_start, [a], rand, 5)
+                    action_eq (_state_start, 0, html_subst_emit,   "    <div class=\"cell\"><a href=\"/engine/tictactoe/_html_click/[r]\" class=\"invisible-link\"></a></div>\r\n")
+                    action_eq (_state_start, 1, html_subst_emit,   "    <div class=\"cell\"><a href=\"/engine/tictactoe/_html_click/[r]\" class=\"invisible-link\"></a></div>\r\n")
+                    action_eq (_state_start, 2, html_subst_emit,   "    <div class=\"cell\"><a href=\"/engine/tictactoe/_html_click/[r]\" class=\"invisible-link\"></a></div>\r\n")
+                    action_eq (_state_start, 3, html_subst_emit,   "    <div class=\"cell x\"></div>\r\n")
+                    action_eq (_state_start, 4, html_subst_emit,   "    <div class=\"cell o\"></div>\r\n")
+                    action (_state_start, nop-)
+                    event_nt (_state_start, html_board_cell)
+                    event_if (_state_start, ready)
                 }
         }            
         }
