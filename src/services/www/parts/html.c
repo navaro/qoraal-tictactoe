@@ -148,24 +148,22 @@ html_emit_wait (HTML_EMIT_T* emit, const char * ep, HTTP_USER_T * user, uint32_t
     emit->user = user ;
     _html_emit = emit ;
 
-    if (engine_queue_masked_event (mask, ENGINE_EVENT_ID_GET(_html_render), 0) != EOK) {
-        timeout = 0 ;
-
-    } else {
-        
+    int32_t res = engine_queue_masked_event (mask, ENGINE_EVENT_ID_GET(_html_render), 0) ;
+    if (res == EOK) {        
         _html_event_mask &= ~mask ;
         
 
     }
     MUTEX_UNLOCK () ;
 
-    if (timeout == 0) {
+    if (res != EOK) {
         DBG_ENGINE_LOG(ENGINE_LOG_TYPE_ERROR,
-                "error: failed to queue event %d\n", ENGINE_EVENT_ID_GET(_html_render)) ;
+                "error: failed %d to queue event %d\n", res, ENGINE_EVENT_ID_GET(_html_render)) ;
+
+    } else {
+        os_sem_wait_timeout (&emit->complete, OS_MS2TICKS(timeout)) ;
 
     }
-
-    os_sem_wait_timeout (&emit->complete, OS_MS2TICKS(timeout)) ;
 
     user =  0 ;
     MUTEX_LOCK () ;
