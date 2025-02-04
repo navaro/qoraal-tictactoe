@@ -12,12 +12,15 @@ FetchContent_Declare(
     GIT_TAG        main  # or whatever branch/commit you need
     SOURCE_SUBDIR  .
 )
+
+set(CFG_ENGINE_REGISTRY_DISABLE ON CACHE BOOL "Disable engine registry")
 FetchContent_Declare(
     qoraal_engine
     GIT_REPOSITORY https://github.com/navaro/qoraal-engine.git
     GIT_TAG        main  # or whatever branch/commit you need
     SOURCE_SUBDIR  .
 )
+
 FetchContent_Declare(
     qoraal_http
     GIT_REPOSITORY https://github.com/navaro/qoraal-http.git
