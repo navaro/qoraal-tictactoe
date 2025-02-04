@@ -5,7 +5,6 @@ decl_version    1
 decl_events {
     _tictac_tick
     _tictac_restart
-    _tictac_render_cell
 }
 
 

@@ -43,25 +43,30 @@ It’s just down the hall, to the right.
 <div align="center">
 But first, let me show you this…
 <br>
-<div align="center">
-  <img src="welcome.png" alt="Welcome" />
-</div>
-<br>
 <br>
 <div align="left">
 
 ```
-decl_name       "Welcome to My Page"
+decl_name       "tic-tac-toe"
 decl_version    1
 
-statemachine html_test {
+
+decl_events {
+    _tictac_tick
+    _tictac_restart
+}
+
+
+statemachine tictactoe {
 
     startstate ready
 
     state ready {
         enter (html_ready)
+        action (_tictac_restart, tictac_restart)
+        action (_tictac_tick, tictac_play, [e])
+        action (_html_render, html_response, HTML)
         event (_html_render, html_head)
-
     }
 
     state html {
@@ -72,39 +77,55 @@ statemachine html_test {
 
     super html {
         state html_head {
-            enter (html_emit,   "<head>"
+            enter (html_emit,   "<head>\r\n"
                                 "<meta charset=\"UTF-8\">\r\n"
                                 "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n"
-                                "<title>Simple Page</title>\r\n"
-                                "<style>\r\n"
-                                "    body {\r\n"
-                                "        font-family: Arial, sans-serif;\r\n"
-                                "        background: radial-gradient(circle, #1e1e2e 0%, #0c0917 90%);\r\n"
-                                "        color: #333;\r\n"
-                                "        display: flex;\r\n"
-                                "        flex-direction: column;\r\n"
-                                "        justify-content: center;\r\n"
-                                "        align-items: center;\r\n"
-                                "        height: 100vh;\r\n"
-                                "        margin: 0;\r\n"
-                                "    }\r\n"
-                                "    h1 {\r\n"
-                                "        color: #AD231F;\r\n"
-                                "    }\r\n"
-                                "</style>\r\n")
+                                "<title>Tic-Tac-Toe</title>\r\n"
+                                "<link rel=\"stylesheet\" href=\"/engine/tictaccss\">\r\n")
             exit (html_emit,    "</head>\r\n")
-            event (_state_start, html_body)
+            event (_state_start, html_board_title)
         }
     }
 
     super html {
         state html_body {
-            enter (html_emit,   "<body>"
-                                "<h1>Welcome to My Page</h1>\r\n"
-                                "<p>This is a simple message to brighten your day!</p>\r\n")
-            exit (html_emit,    "</body>")
-            event (_state_start, ready)
+            enter (html_emit,   "<body>\r\n")
+            exit (html_emit,    "<button class=\"restart-btn\" onclick=\"window.location.href='/engine/tictactoe/[_tictac_restart]'\">Restart</button>\r\n"
+                                "<button class=\"restart-btn\" onclick=\"window.location.href='/index'\">Take Me Home</button>"
+                                "</body>")
 
+        }
+        super html_body {
+
+            state html_board_title {
+                action (_state_start, html_emit,                        "<h1>Tic-Tac-Toe</h1>\r\n")
+                action_ld (_state_start, [a], tictac_status)
+                action_eq (_state_start, TICTAC_DRAW, html_emit,        "<div id=\"winner-message\" class=\"winner\"> Draw </div>\r\n\r\n")
+                action_eq (_state_start, TICTAC_PLAYER_WIN, html_emit,  "<div id=\"winner-message\" class=\"winner\"> 👑 Player Wins! 👑 </div>\r\n")
+                action_eq (_state_start, TICTAC_AI_WIN, html_emit,      "<div id=\"winner-message\" class=\"winner\"> 🎉 AI Wins! 🎉 </div>\r\n")
+                event (_state_start, html_board_cell)
+
+            }
+           
+            state html_board {
+                enter (r_load, 0)
+                enter (html_emit,   "<div class=\"board\">\r\n")
+                exit (html_emit,    "</div>\r\n")
+
+            }
+            super html_board {
+                state html_board_cell {
+                    action_ld (_state_start, [a], tictac_cell, [r])
+                    action_eq (_state_start, TICTAC_OPEN, html_subst_emit,   "<div class=\"cell\"><a href=\"/engine/tictactoe/[_tictac_tick]/[r]\" class=\"invisible-link\"></a></div>\r\n")
+                    action_eq (_state_start, TICTAC_PLAYER, html_emit,       "<div class=\"cell x\"></div>\r\n")
+                    action_eq (_state_start, TICTAC_AI, html_emit,           "<div class=\"cell o\"></div>\r\n")
+                    action_eq (_state_start, TICTAC_PLAYER_BLINK, html_emit, "<div class=\"cell x blink\"></div>\r\n")
+                    action_eq (_state_start, TICTAC_AI_BLINK, html_emit,     "<div class=\"cell o blink\"></div>\r\n")
+                    action (_state_start, r_inc, 9)
+                    event_nt (_state_start, html_board_cell)
+                    event_if (_state_start, ready)
+                }
+            }            
         }
     }
 
