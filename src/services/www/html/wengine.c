@@ -35,14 +35,19 @@ static HTML_EMIT_T  _wengine_emit ;
 const char*
 wengine_ctrl (HTTP_USER_T *user, uint32_t method, char* endpoint, uint32_t type)
 {
+    static int started = 0 ;
     if (type == WSERVER_CTRL_METADATA_HEADING) {
         return "Engine" ;
     }
     else if (type == WSERVER_CTRL_START){
-        html_emit_create (&_wengine_emit) ;
+        if (!started) {
+            html_emit_create (&_wengine_emit) ;
+            started = 1 ;
+        }
     }
     else if (type == WSERVER_CTRL_STOP){
         html_emit_delete (&_wengine_emit) ;
+        started = 0 ;
     }
     
     return 0 ;
@@ -61,6 +66,8 @@ wengine_handler (HTTP_USER_T *user, uint32_t method, char* endpoint)
 
     char* cmd[5]  = {0} ;
     int i ;
+    uint16_t event = 0 ;
+    uint16_t parm = 0 ;
 
     cmd[0] = strchr (endpoint, '/') ;
     for (i=0; i<5; i++) {
@@ -78,18 +85,20 @@ wengine_handler (HTTP_USER_T *user, uint32_t method, char* endpoint)
 
         }
 
-
-        res = html_emit_wait (&_wengine_emit, cmd[0], user, 4000) ;
-        if (res == E_UNEXP) {
-            res =  httpserver_write_response (user, WSERVER_RESP_CODE_404, HTTP_SERVER_CONTENT_TYPE_HTML,
-                0, 0, WSERVER_RESP_CONTENT_500, strlen(WSERVER_RESP_CONTENT_500)) ;
-
-        } else if (res = E_NOTFOUND) {  
+        if (cmd[1]) event = (uint16_t)atoi(cmd[1]) ;
+        if (cmd[2]) parm = (uint16_t)atoi(cmd[2]) ;
+        res = html_emit_wait (cmd[0], event, parm, user, 4000) ;
+        html_emit_unlock (&_wengine_emit) ;
+        if (res = E_NOTFOUND) {  
             res =  httpserver_write_response (user, WSERVER_RESP_CODE_404, HTTP_SERVER_CONTENT_TYPE_HTML,
                 0, 0, WSERVER_RESP_CONTENT_404, strlen(WSERVER_RESP_CONTENT_404)) ;
 
+        } else if (res != EOK) {
+            res =  httpserver_write_response (user, WSERVER_RESP_CODE_404, HTTP_SERVER_CONTENT_TYPE_HTML,
+                0, 0, WSERVER_RESP_CONTENT_500, strlen(WSERVER_RESP_CONTENT_500)) ;
+
         }
-        html_emit_unlock (&_wengine_emit) ;
+        
         return res ;
 
     } else {

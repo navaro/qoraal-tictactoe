@@ -53,14 +53,13 @@ statemachine tictactoe {
             }
             super html_board {
                 state html_board_cell {
-                    enter (r_inc+, 9) // push the result of the comparison == 9
                     action_ld (_state_start, [a], rand, 5)
-                    action_eq (_state_start, 0, html_subst_emit,   "    <div class=\"cell\"><a href=\"/engine/tictactoe/_html_click/[r]\" class=\"invisible-link\"></a></div>\r\n")
-                    action_eq (_state_start, 1, html_subst_emit,   "    <div class=\"cell\"><a href=\"/engine/tictactoe/_html_click/[r]\" class=\"invisible-link\"></a></div>\r\n")
-                    action_eq (_state_start, 2, html_subst_emit,   "    <div class=\"cell\"><a href=\"/engine/tictactoe/_html_click/[r]\" class=\"invisible-link\"></a></div>\r\n")
+                    action_eq (_state_start, 0, html_subst_emit,   "    <div class=\"cell\"><a href=\"/engine/tictactoe/[_tick]/[r]\" class=\"invisible-link\"></a></div>\r\n")
+                    action_eq (_state_start, 1, html_subst_emit,   "    <div class=\"cell\"><a href=\"/engine/tictactoe/[_tick]/[r]\" class=\"invisible-link\"></a></div>\r\n")
+                    action_eq (_state_start, 2, html_subst_emit,   "    <div class=\"cell\"><a href=\"/engine/tictactoe/[_tick]/[r]\" class=\"invisible-link\"></a></div>\r\n")
                     action_eq (_state_start, 3, html_subst_emit,   "    <div class=\"cell x\"></div>\r\n")
                     action_eq (_state_start, 4, html_subst_emit,   "    <div class=\"cell o\"></div>\r\n")
-                    action (_state_start, nop-) // pop the result
+                    action (_state_start, r_inc, 9) // pop the result
                     event_nt (_state_start, html_board_cell)
                     event_if (_state_start, ready)
                 }

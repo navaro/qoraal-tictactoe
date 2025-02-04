@@ -50,7 +50,7 @@ typedef struct HTML_EMIT_S {
     HTTP_USER_T *           user ;
     int32_t                 response ;
     p_sem_t                 lock ;
-    p_sem_t                 complete ;
+    p_event_t               complete ;
 } HTML_EMIT_T ;
 
 /*===========================================================================*/
@@ -66,7 +66,7 @@ extern "C" {
     int32_t     html_emit_lock (HTML_EMIT_T* emit, uint32_t timeout) ;
     void        html_emit_unlock (HTML_EMIT_T* emit) ;
 
-    int32_t     html_emit_wait (HTML_EMIT_T* emit, const char * ep, HTTP_USER_T * user, uint32_t timeout) ;
+    int32_t     html_emit_wait (const char * ep, uint16_t event, uint16_t parm, HTTP_USER_T * user, uint32_t timeout) ;
 
 #ifdef __cplusplus
 }

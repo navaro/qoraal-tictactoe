@@ -99,11 +99,12 @@ ENGINE_CMD_FP_IMPL (part_html_cmd) ;
 int32_t 
 html_emit_create (HTML_EMIT_T* emit)
 {
-    if (os_bsem_create (&emit->complete, 1) != EOK) {
+    if (os_event_create (&emit->complete) != EOK) {
+        html_emit_delete (emit) ;
         return EFAIL ;
     }
     if (os_sem_create (&emit->lock, 1) != EOK) {
-        os_bsem_delete (&emit->complete) ;
+        html_emit_delete (emit) ;
         return EFAIL ;
     }
 
@@ -113,27 +114,36 @@ html_emit_create (HTML_EMIT_T* emit)
 void 
 html_emit_delete (HTML_EMIT_T* emit)
 {
-    os_bsem_delete (&emit->complete) ;
-    os_sem_delete (&emit->lock) ;
+    if (emit->complete) os_event_delete (&emit->complete) ;
+    if (emit->lock) os_sem_delete (&emit->lock) ;
+    emit->complete = 0 ;
+    emit->lock = 0 ;
     emit->user = 0 ;
 }
 
 int32_t 
 html_emit_lock (HTML_EMIT_T* emit, uint32_t timeout)
 {
-    return os_sem_wait_timeout (&emit->lock, OS_MS2TICKS(timeout)) ;
+    int32_t res = os_sem_wait_timeout (&emit->lock, OS_MS2TICKS(timeout)) ;
+    if (res == EOK) {
+        _html_emit = emit ;
+    }
+
+    return res ;
 }
 
 void 
 html_emit_unlock (HTML_EMIT_T* emit)
 {
+    _html_emit = 0 ;
     os_sem_signal (&emit->lock) ;
 }
 
 int32_t 
-html_emit_wait (HTML_EMIT_T* emit, const char * ep, HTTP_USER_T * user, uint32_t timeout)
+html_emit_wait (const char * ep, uint16_t event, uint16_t parm, HTTP_USER_T * user, uint32_t timeout)
 {
-    if (!_html_event_mask) return E_UNEXP ;
+    if (!_html_event_mask || !_html_emit) return E_UNEXP ;
+    if (!user) return E_PARM ;
 
     uint32_t mask ;
     MUTEX_LOCK () ;
@@ -143,44 +153,29 @@ html_emit_wait (HTML_EMIT_T* emit, const char * ep, HTTP_USER_T * user, uint32_t
 
     if (!mask) return E_NOTFOUND ;
 
-    MUTEX_LOCK () ;
-    emit->response = -1 ;
-    emit->user = user ;
-    _html_emit = emit ;
+    _html_emit->response = -1 ;
+    _html_emit->user = user ;
 
-    int32_t res = engine_queue_masked_event (mask, ENGINE_EVENT_ID_GET(_html_render), 0) ;
-    if (res == EOK) {        
-        _html_event_mask &= ~mask ;
-        
-
+    if (event) {
+        engine_queue_masked_event (mask, event, parm) ;
     }
-    MUTEX_UNLOCK () ;
 
-    if (res != EOK) {
+    _html_event_mask &= ~mask ;
+    int32_t res = engine_queue_masked_event (mask, ENGINE_EVENT_ID_GET(_html_render), 0) ;
+    if (res != EOK) {        
+        _html_event_mask |= mask ;
         DBG_ENGINE_LOG(ENGINE_LOG_TYPE_ERROR,
                 "error: failed %d to queue event %d\n", res, ENGINE_EVENT_ID_GET(_html_render)) ;
 
     } else {
-        os_sem_wait_timeout (&emit->complete, OS_MS2TICKS(timeout)) ;
-
-    }
-
-    user =  0 ;
-    MUTEX_LOCK () ;
-    if (_html_emit) {
+        os_event_wait_timeout (&_html_emit->complete, 1, mask, 0, OS_MS2TICKS(timeout)) ;
         if (_html_emit->response >= 0) {
-          user =  _html_emit->user ;
+            httpserver_chunked_complete (_html_emit->user) ;
 
         }
-        _html_emit->response = -1 ;
-        _html_emit = 0 ;
-    }
-    MUTEX_UNLOCK () ;
-
-    if (user) {
-        httpserver_chunked_complete (user) ;
 
     }
+
 
     return EOK ;
 }
@@ -351,9 +346,10 @@ action_html_ready (PENGINE_T instance, uint32_t parm, uint32_t flags)
     }
 
     MUTEX_LOCK () ;
-    _html_event_mask |= engine_get_mask (instance) ;
+    uint32_t mask = engine_get_mask (instance) ;
+    _html_event_mask |= mask ;
     if (_html_emit && _html_emit->complete) {
-       os_sem_signal (&_html_emit->complete) ;
+       os_event_signal (&_html_emit->complete, mask) ;
     }
     MUTEX_UNLOCK () ;
 

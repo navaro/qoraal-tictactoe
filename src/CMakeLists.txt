@@ -4,6 +4,7 @@ set(TEST_SRCS
     services/system.c
     services/engine.c
     services/www/parts/html.c
+    services/www/parts/tictactoe.c
     services/www/wserver_inst.c
     services/www/css/wcss.c
     services/www/html/wabout.c

@@ -154,7 +154,6 @@ engine_machine_start (const char *filename, void* ctx, STARTER_OUT_FP log_cb, bo
      * Lets get the engine started...
      */
     starter_stop();
-    starter_init(0);
     if (start) {
         res = starter_start (buffer, sz, ctx, log_cb, verbose);
         if (res) {
