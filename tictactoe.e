@@ -3,7 +3,9 @@ decl_version    1
 
 
 decl_events {
-    _tick
+    _tictac_tick
+    _tictac_restart
+    _tictac_render_cell
 }
 
 
@@ -13,6 +15,8 @@ statemachine tictactoe {
 
     state ready {
         enter (html_ready)
+        action (_tictac_restart, tictac_restart)
+        action (_tictac_tick, tictac_play, [e])
         action (_html_render, html_response, HTML)
         event (_html_render, html_head)
     }
@@ -31,39 +35,49 @@ statemachine tictactoe {
                                 "<title>Tic-Tac-Toe</title>\r\n"
                                 "<link rel=\"stylesheet\" href=\"/engine/tictaccss\">\r\n")
             exit (html_emit,    "</head>\r\n")
-            event (_state_start, html_board_cell)
+            event (_state_start, html_board_title)
         }
     }
 
     super html {
         state html_body {
-            enter (html_emit,   "<body>\r\n"
-                                "<h1>Tic-Tac-Toe</h1>\r\n")
-            exit (html_emit,    "<button class=\"restart-btn\" onclick=\"window.location.href='/engine/tictactoe'\">Restart</button>\r\n"
+            enter (html_emit,   "<body>\r\n")
+            exit (html_emit,    "<button class=\"restart-btn\" onclick=\"window.location.href='/engine/tictactoe/[_tictac_restart]'\">Restart</button>\r\n"
                                 "<button class=\"restart-btn\" onclick=\"window.location.href='/index'\">Take Me Home</button>"
                                 "</body>")
-            event (_state_start, html_board)
+
         }
         super html_body {
+
+            state html_board_title {
+                action (_state_start, html_emit,                        "<h1>Tic-Tac-Toe</h1>\r\n")
+                action_ld (_state_start, [a], tictac_status)
+                action_eq (_state_start, TICTAC_DRAW, html_emit,        "<h1>DRAW!</h1>\r\n")
+                action_eq (_state_start, TICTAC_PLAYER_WIN, html_emit,  "<h1>Player Wins!</h1>\r\n")
+                action_eq (_state_start, TICTAC_AI_WIN, html_emit,      "<h1>AI Wins!</h1>\r\n")
+                event (_state_start, html_board_cell)
+
+            }
+           
             state html_board {
                 enter (r_load, 0)
                 enter (html_emit,   "<div class=\"board\">\r\n")
                 exit (html_emit,    "</div>\r\n")
-                event (_state_start, ready)
+
             }
             super html_board {
                 state html_board_cell {
-                    action_ld (_state_start, [a], rand, 5)
-                    action_eq (_state_start, 0, html_subst_emit,   "    <div class=\"cell\"><a href=\"/engine/tictactoe/[_tick]/[r]\" class=\"invisible-link\"></a></div>\r\n")
-                    action_eq (_state_start, 1, html_subst_emit,   "    <div class=\"cell\"><a href=\"/engine/tictactoe/[_tick]/[r]\" class=\"invisible-link\"></a></div>\r\n")
-                    action_eq (_state_start, 2, html_subst_emit,   "    <div class=\"cell\"><a href=\"/engine/tictactoe/[_tick]/[r]\" class=\"invisible-link\"></a></div>\r\n")
-                    action_eq (_state_start, 3, html_subst_emit,   "    <div class=\"cell x\"></div>\r\n")
-                    action_eq (_state_start, 4, html_subst_emit,   "    <div class=\"cell o\"></div>\r\n")
-                    action (_state_start, r_inc, 9) // pop the result
+                    action_ld (_state_start, [a], tictac_cell, [r])
+                    action_eq (_state_start, TICTAC_OPEN, html_subst_emit,   "<div class=\"cell\"><a href=\"/engine/tictactoe/[_tictac_tick]/[r]\" class=\"invisible-link\"></a></div>\r\n")
+                    action_eq (_state_start, TICTAC_PLAYER, html_emit,       "<div class=\"cell x\"></div>\r\n")
+                    action_eq (_state_start, TICTAC_AI, html_emit,           "<div class=\"cell o\"></div>\r\n")
+                    action_eq (_state_start, TICTAC_PLAYER_BLINK, html_emit, "<div class=\"cell x blink\"></div>\r\n")
+                    action_eq (_state_start, TICTAC_AI_BLINK, html_emit,     "<div class=\"cell o blink\"></div>\r\n")
+                    action (_state_start, r_inc, 9)
                     event_nt (_state_start, html_board_cell)
                     event_if (_state_start, ready)
                 }
-        }            
+            }            
         }
     }
 
@@ -245,6 +259,14 @@ statemachine tictaccss {
             "    top: 0;\r\n"
             "    left: 0;\r\n"
             "    z-index: 1;\r\n"
+            "}\r\n"
+            "@keyframes blink-symbol {\r\n"
+            "    0%, 100% { opacity: 1; }\r\n"
+            "    50% { opacity: 0; }\r\n"
+            "}\r\n"
+            ".cell.blink::before,\r\n"
+            ".cell.blink::after {\r\n"
+            "    animation: blink-symbol 0.8s step-start 3;\r\n"
             "}\r\n")
 
             event (_state_start, ready)

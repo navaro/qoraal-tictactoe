@@ -6,11 +6,174 @@
 #include "qoraal/qoraal.h"
 #include "qoraal/svc/svc_services.h"
 #include "qoraal/svc/svc_shell.h"
+#include "qoraal-engine/parts/parts.h"
+#include "qoraal-engine/engine.h"
 
+
+
+
+static int choose_move_epsilon(int board[9], double epsilon) ;
+static int check_winner(int board[9], int win[9]) ;
+static int board_full(int board[9]) ;
 
 
 SVC_SHELL_CMD_DECL("tictactoe", qshell_cmd_tictactoe, "");
 SVC_SHELL_CMD_DECL("tictactrain", qshell_cmd_tictactrain, "");
+
+
+#define TICTACTTOE_STATE_PLAY               0
+#define TICTACTTOE_STATE_DRAW               1
+#define TICTACTTOE_STATE_PLAYER_WIN         2
+#define TICTACTTOE_STATE_AI_WIN             3
+
+#define TICTACTTOE_CELL_OPEN                0
+#define TICTACTTOE_CELL_PLAYER              1
+#define TICTACTTOE_CELL_AI                  2
+#define TICTACTTOE_CELL_PLAYER_BLINK        3
+#define TICTACTTOE_CELL_AI_BLINK            4
+
+
+int     _tictactoe_board[9] = {0,0,0, 0,0,0, 0,0,0} ; 
+int     _tictactoe_board_blink[9] = {0,0,0, 0,0,0, 0,0,0} ; 
+int     _tictactoe_player = TICTACTTOE_CELL_PLAYER ; 
+
+
+
+
+/**
+ * @brief   Initialises constants for part
+ *
+ */
+ENGINE_CONST_IMPL(TICTACTTOE_STATE_PLAY,        TICTAC_PLAY,        "Game in play");
+ENGINE_CONST_IMPL(TICTACTTOE_STATE_DRAW,        TICTAC_DRAW,        "Draw");
+ENGINE_CONST_IMPL(TICTACTTOE_STATE_PLAYER_WIN,  TICTAC_PLAYER_WIN,  "Player win");
+ENGINE_CONST_IMPL(TICTACTTOE_STATE_AI_WIN,      TICTAC_AI_WIN,      "AI win");
+ENGINE_CONST_IMPL(TICTACTTOE_CELL_OPEN,         TICTAC_OPEN,        "Cell open");
+ENGINE_CONST_IMPL(TICTACTTOE_CELL_PLAYER,       TICTAC_PLAYER,      "Cell used by player");
+ENGINE_CONST_IMPL(TICTACTTOE_CELL_AI,           TICTAC_AI,          "Cell used by AI");
+ENGINE_CONST_IMPL(TICTACTTOE_CELL_PLAYER_BLINK, TICTAC_PLAYER_BLINK,"Cell used by player");
+ENGINE_CONST_IMPL(TICTACTTOE_CELL_AI_BLINK,     TICTAC_AI_BLINK,    "Cell used by AI");
+
+
+ENGINE_ACTION_IMPL  (tictac_restart,    "Restart the game") ;
+ENGINE_ACTION_IMPL  (tictac_play,       "User play the cell nuumber 0-8 in the param") ;
+ENGINE_ACTION_IMPL  (tictac_status,     "Returns the TICTA_xxx state of the game") ;
+ENGINE_ACTION_IMPL  (tictac_cell,       "Returns the CELL_xxx state for cell param 0-8") ;
+
+
+/**
+ * @brief  action_tictac_restart
+ * @param[in] instance      engine instance.
+ * @param[in] parm          parameter.
+ * @param[in] flags         validate and parameter type flag.
+ */
+int32_t
+action_tictac_restart (PENGINE_T instance, uint32_t parm, uint32_t flags)
+{
+    if (flags & (PART_ACTION_FLAG_VALIDATE)) {
+        return  EOK   ;
+
+    }
+    memset (_tictactoe_board, 0, sizeof(_tictactoe_board)) ;
+    memset (_tictactoe_board_blink, 0, sizeof(_tictactoe_board_blink)) ;
+    if (_tictactoe_player == TICTACTTOE_CELL_PLAYER) {
+        _tictactoe_player = TICTACTTOE_CELL_AI ;
+        return EOK ;
+    }
+    _tictactoe_player = TICTACTTOE_CELL_PLAYER ;
+
+    int action = choose_move_epsilon(_tictactoe_board, 0.0);
+    if (action < 0) return EFAIL ;
+
+    _tictactoe_board[action] = 1;
+    _tictactoe_board_blink[action] = 1;
+
+    return EOK ;
+}
+
+
+/**
+ * @brief   action_tictac_play
+ * @param[in] instance      engine instance.
+ * @param[in] parm          parameter.
+ * @param[in] flags         validate and parameter type flag.
+ */
+int32_t
+action_tictac_play (PENGINE_T instance, uint32_t parm, uint32_t flags)
+{
+    if (flags & (PART_ACTION_FLAG_VALIDATE)) {
+        return  EOK   ;
+
+    }
+    memset (_tictactoe_board_blink, 0, sizeof(_tictactoe_board_blink)) ;
+    if (parm < 0 || parm >= 9) return EFAIL ;
+    if (_tictactoe_board[parm]) return EFAIL ;
+    if (check_winner(_tictactoe_board, _tictactoe_board_blink)) return EOK ;
+
+
+    _tictactoe_board[parm] = -1;
+    if (check_winner(_tictactoe_board, _tictactoe_board_blink)) return EOK ;
+
+    int action = choose_move_epsilon(_tictactoe_board, 0.0);
+    if (action < 0) return EFAIL ;
+
+    _tictactoe_board[action] = 1;
+    _tictactoe_board_blink[action] = 1 ;
+
+
+    return EOK ;
+}
+
+/**
+ * @brief   action_tictac_status
+ * @param[in] instance      engine instance.
+ * @param[in] parm          parameter.
+ * @param[in] flags         validate and parameter type flag.
+ */
+int32_t
+action_tictac_status (PENGINE_T instance, uint32_t parm, uint32_t flags)
+{
+    if (flags & (PART_ACTION_FLAG_VALIDATE)) {
+        return  EOK   ;
+
+    }
+
+    int winner = check_winner(_tictactoe_board, _tictactoe_board_blink);
+    if (winner == 1) {
+        return TICTACTTOE_STATE_AI_WIN ;
+    }
+    else if (winner == -1) {
+        return TICTACTTOE_STATE_PLAYER_WIN;
+    }
+    else if (board_full(_tictactoe_board)) {
+        return TICTACTTOE_STATE_DRAW;
+    }
+
+    return TICTACTTOE_STATE_PLAY ;
+}
+
+/**
+ * @brief   action_tictac_cell
+ * @param[in] instance      engine instance.
+ * @param[in] parm          parameter.
+ * @param[in] flags         validate and parameter type flag.
+ */
+int32_t
+action_tictac_cell (PENGINE_T instance, uint32_t parm, uint32_t flags)
+{
+    if (flags & (PART_ACTION_FLAG_VALIDATE)) {
+        return  EOK   ;
+
+    }
+    if (parm < 0 || parm >= 9) return EFAIL ;
+
+    if (_tictactoe_board[parm] == -1) return _tictactoe_board_blink[parm] ? TICTACTTOE_CELL_PLAYER_BLINK : TICTACTTOE_CELL_PLAYER ;
+    if (_tictactoe_board[parm] == 1) return  _tictactoe_board_blink[parm] ? TICTACTTOE_CELL_AI_BLINK : TICTACTTOE_CELL_AI ;
+
+    return TICTACTTOE_CELL_OPEN ;
+}
+
+
 
 #define INPUT_SIZE 9
 #define HIDDEN_SIZE 9
@@ -23,7 +186,7 @@ typedef struct {
     double output_biases[OUTPUT_SIZE];
 } NeuralNet;
 
-NeuralNet _tictactoe_net = {
+static NeuralNet _tictactoe_net = {
 {
     { 0.106844, 2.297165, -4.215321, 0.590149, -4.113728, 1.123057, -2.406111, 0.652693, 2.410074 },
     { -1.485419, 2.351545, -3.254365, -0.902239, 1.054924, -0.451825, -0.939223, 2.492350, -2.197246 },
@@ -56,16 +219,16 @@ NeuralNet _tictactoe_net = {
 
 
 
-double sigmoid(double x) {
+static double sigmoid(double x) {
     return 1.0 / (1.0 + exp(-x));
 }
 
-double rand_weight() {
+static double rand_weight() {
     // Random weight in range [-1, 1]
     return ((double)rand() / RAND_MAX) * 2.0 - 1.0;
 }
 
-void init_network(void) {
+static void init_network(void) {
     NeuralNet *net = &_tictactoe_net ; 
     for (int i = 0; i < HIDDEN_SIZE; i++) {
         for (int j = 0; j < INPUT_SIZE; j++) {
@@ -81,7 +244,7 @@ void init_network(void) {
     }
 }
 
-void forward_with_hidden(double input[INPUT_SIZE], double hidden[HIDDEN_SIZE], double output[OUTPUT_SIZE]) {
+static void forward_with_hidden(double input[INPUT_SIZE], double hidden[HIDDEN_SIZE], double output[OUTPUT_SIZE]) {
     NeuralNet *net = &_tictactoe_net ; 
     for (int i = 0; i < HIDDEN_SIZE; i++) {
         double sum = net->hidden_biases[i];
@@ -99,7 +262,7 @@ void forward_with_hidden(double input[INPUT_SIZE], double hidden[HIDDEN_SIZE], d
     }
 }
 
-void board_to_input(int board[9], double input[9]) {
+static void board_to_input(int board[9], double input[9]) {
     for (int i = 0; i < 9; i++) {
         // Mapping: -1 -> 0.0, 0 -> 0.5, 1 -> 1.0
         input[i] = (board[i] + 1) / 2.0;
@@ -107,7 +270,7 @@ void board_to_input(int board[9], double input[9]) {
 }
 
 // Returns 1 if player 1 wins, -1 if player -1 wins, 0 if no winner.
-int check_winner(int board[9]) {
+static int check_winner(int board[9], int win[9]) {
     int wins[8][3] = {
         {0,1,2}, {3,4,5}, {6,7,8},
         {0,3,6}, {1,4,7}, {2,5,8},
@@ -115,13 +278,15 @@ int check_winner(int board[9]) {
     };
     for (int i = 0; i < 8; i++) {
         int a = wins[i][0], b = wins[i][1], c = wins[i][2];
-        if (board[a] != 0 && board[a] == board[b] && board[b] == board[c])
+        if (board[a] != 0 && board[a] == board[b] && board[b] == board[c]) {
+            if (win) win[a] = win[b] = win[c] = board[a] ;
             return board[a];
+        }
     }
     return 0;
 }
 
-int board_full(int board[9]) {
+static int board_full(int board[9]) {
     for (int i = 0; i < 9; i++) {
         if (board[i] == 0)
             return 0;
@@ -130,7 +295,7 @@ int board_full(int board[9]) {
 }
 
 // Epsilon-greedy move selection.
-int choose_move_epsilon(int board[9], double epsilon) {
+static int choose_move_epsilon(int board[9], double epsilon) {
     NeuralNet *net = &_tictactoe_net ; 
     int legal_moves[9], count = 0;
     for (int i = 0; i < 9; i++) {
@@ -163,7 +328,7 @@ int choose_move_epsilon(int board[9], double epsilon) {
 }
 
 // Q-learning training step for the chosen action.
-void train_step(int board[9], int action, double reward, int next_board[9], int terminal, double learning_rate, double gamma) {
+static void train_step(int board[9], int action, double reward, int next_board[9], int terminal, double learning_rate, double gamma) {
     NeuralNet *net = &_tictactoe_net ; 
     double input[INPUT_SIZE];
     board_to_input(board, input);
@@ -217,82 +382,82 @@ void train_step(int board[9], int action, double reward, int next_board[9], int 
     }
 }
 
-void copy_board(int dest[9], int src[9]) {
+static void copy_board(int dest[9], int src[9]) {
     memcpy(dest, src, sizeof(int) * 9);
 }
 
-void print_board(int board[9]) {
+static void print_board(SVC_SHELL_IF_T * pif, int board[9]) {
     // Mapping: -1 -> 'O', 0 -> ' ', 1 -> 'X'
-    char symbols[3] = { 'O', ' ', 'X' };
+    char symbols[3] = { 'X', ' ', 'O' };
     for (int i = 0; i < 9; i++) {
         int idx = board[i] + 1;  // -1 becomes 0, 0 becomes 1, 1 becomes 2
-        printf(" %c ", symbols[idx]);
+        svc_shell_print (pif, SVC_SHELL_OUT_STD, " %c ", symbols[idx]);
         if ((i + 1) % 3 == 0) {
-            printf("\n");
+            svc_shell_print (pif, SVC_SHELL_OUT_STD, "\n");
             if (i != 8)
-                printf("---+---+---\n");
+                svc_shell_print (pif, SVC_SHELL_OUT_STD, "---+---+---\n");
         } else {
-            printf("|");
+            svc_shell_print (pif, SVC_SHELL_OUT_STD, "|");
         }
     }
 }
 
-void print_trained_weights(void) {
+static void print_trained_weights(SVC_SHELL_IF_T * pif) {
     NeuralNet *net = &_tictactoe_net ; 
     int i, j;
-    printf("\n// Trained Weights for Initialization\n\n");
+    svc_shell_print (pif, SVC_SHELL_OUT_STD, "\n// Trained Weights for Initialization\n\n");
 
     // Print weights_input_hidden
-    printf("double weights_input_hidden[%d][%d] = {\n", HIDDEN_SIZE, INPUT_SIZE);
+    svc_shell_print (pif, SVC_SHELL_OUT_STD, "double weights_input_hidden[%d][%d] = {\n", HIDDEN_SIZE, INPUT_SIZE);
     for (i = 0; i < HIDDEN_SIZE; i++) {
-        printf("    { ");
+        svc_shell_print (pif, SVC_SHELL_OUT_STD, "    { ");
         for (j = 0; j < INPUT_SIZE; j++) {
-            printf("%.6f", net->weights_input_hidden[i][j]);
+            svc_shell_print (pif, SVC_SHELL_OUT_STD, "%.6f", net->weights_input_hidden[i][j]);
             if (j < INPUT_SIZE - 1)
-                printf(", ");
+                svc_shell_print (pif, SVC_SHELL_OUT_STD, ", ");
         }
-        printf(" }");
+        svc_shell_print (pif, SVC_SHELL_OUT_STD, " }");
         if (i < HIDDEN_SIZE - 1)
-            printf(",\n");
+            svc_shell_print (pif, SVC_SHELL_OUT_STD, ",\n");
         else
-            printf("\n");
+            svc_shell_print (pif, SVC_SHELL_OUT_STD, "\n");
     }
-    printf("};\n\n");
+    svc_shell_print (pif, SVC_SHELL_OUT_STD, "};\n\n");
 
     // Print hidden_biases
-    printf("double hidden_biases[%d] = { ", HIDDEN_SIZE);
+    svc_shell_print (pif, SVC_SHELL_OUT_STD, "double hidden_biases[%d] = { ", HIDDEN_SIZE);
     for (i = 0; i < HIDDEN_SIZE; i++) {
-        printf("%.6f", net->hidden_biases[i]);
+        svc_shell_print (pif, SVC_SHELL_OUT_STD, "%.6f", net->hidden_biases[i]);
         if (i < HIDDEN_SIZE - 1)
-            printf(", ");
+            svc_shell_print (pif, SVC_SHELL_OUT_STD, ", ");
     }
-    printf(" };\n\n");
+    svc_shell_print (pif, SVC_SHELL_OUT_STD, " };\n\n");
 
     // Print weights_hidden_output
-    printf("double weights_hidden_output[%d][%d] = {\n", OUTPUT_SIZE, HIDDEN_SIZE);
+    svc_shell_print (pif, SVC_SHELL_OUT_STD, "double weights_hidden_output[%d][%d] = {\n", OUTPUT_SIZE, HIDDEN_SIZE);
     for (i = 0; i < OUTPUT_SIZE; i++) {
-        printf("    { ");
+        svc_shell_print (pif, SVC_SHELL_OUT_STD, "    { ");
         for (j = 0; j < HIDDEN_SIZE; j++) {
-            printf("%.6f", net->weights_hidden_output[i][j]);
+            svc_shell_print (pif, SVC_SHELL_OUT_STD, "%.6f", net->weights_hidden_output[i][j]);
             if (j < HIDDEN_SIZE - 1)
-                printf(", ");
+                svc_shell_print (pif, SVC_SHELL_OUT_STD, ", ");
         }
-        printf(" }");
+        svc_shell_print (pif, SVC_SHELL_OUT_STD, " }");
         if (i < OUTPUT_SIZE - 1)
-            printf(",\n");
+            svc_shell_print (pif, SVC_SHELL_OUT_STD, ",\n");
         else
-            printf("\n");
+            svc_shell_print (pif, SVC_SHELL_OUT_STD, "\n");
     }
-    printf("};\n\n");
+    svc_shell_print (pif, SVC_SHELL_OUT_STD, "};\n\n");
 
     // Print output_biases
-    printf("double output_biases[%d] = { ", OUTPUT_SIZE);
+    svc_shell_print (pif, SVC_SHELL_OUT_STD, "double output_biases[%d] = { ", OUTPUT_SIZE);
     for (i = 0; i < OUTPUT_SIZE; i++) {
-        printf("%.6f", net->output_biases[i]);
+        svc_shell_print (pif, SVC_SHELL_OUT_STD, "%.6f", net->output_biases[i]);
         if (i < OUTPUT_SIZE - 1)
-            printf(", ");
+            svc_shell_print (pif, SVC_SHELL_OUT_STD, ", ");
     }
-    printf(" };\n\n");
+    svc_shell_print (pif, SVC_SHELL_OUT_STD, " };\n\n");
 }
 
 
@@ -300,17 +465,17 @@ static int32_t
 qshell_cmd_tictactoe (SVC_SHELL_IF_T * pif, char** argv, int argc)
 {
     // Demonstration game (AI vs. random opponent, no exploration).
-    printf("\n=== Demonstration Game ===\n");
+    svc_shell_print (pif, SVC_SHELL_OUT_STD, "\n=== Demonstration Game ===\n");
     int board[9] = {0,0,0, 0,0,0, 0,0,0};
     int current_player = 0;
-    while (!check_winner(board) && !board_full(board)) {
+    while (!check_winner(board, 0) && !board_full(board)) {
         if (current_player == 1) {
             int action = choose_move_epsilon(board, 0.0);
             if (action == -1)
                 break;
             board[action] = 1;
-            printf("\nAI moves at position %d:\n", action);
-            print_board(board);
+            svc_shell_print (pif, SVC_SHELL_OUT_STD, "\nAI moves at position %d:\n", action);
+            print_board(pif, board);
             current_player = -1;
         } else {
             int legal_moves[9], count = 0;
@@ -322,18 +487,18 @@ qshell_cmd_tictactoe (SVC_SHELL_IF_T * pif, char** argv, int argc)
                 break;
             int move = legal_moves[rand() % count];
             board[move] = -1;
-            printf("\nOpponent moves at position %d:\n", move);
-            print_board(board);
+            svc_shell_print (pif, SVC_SHELL_OUT_STD, "\nOpponent moves at position %d:\n", move);
+            print_board(pif, board);
             current_player = 1;
         }
     }
-    int winner = check_winner(board);
+    int winner = check_winner(board, 0);
     if (winner == 1)
-        printf("\nAI wins the demonstration game!\n");
+        svc_shell_print (pif, SVC_SHELL_OUT_STD, "\nAI wins the demonstration game!\n");
     else if (winner == -1)
-        printf("\nOpponent wins the demonstration game!\n");
+        svc_shell_print (pif, SVC_SHELL_OUT_STD, "\nOpponent wins the demonstration game!\n");
     else
-        printf("\nIt's a draw in the demonstration game!\n");
+        svc_shell_print (pif, SVC_SHELL_OUT_STD, "\nIt's a draw in the demonstration game!\n");
 
     return EOK ;
 }
@@ -350,6 +515,10 @@ qshell_cmd_tictactrain (SVC_SHELL_IF_T * pif, char** argv, int argc)
     double learning_rate = 0.1;
     double gamma = 0.9;
     double epsilon = 0.3;  // initial exploration rate
+
+    if (argc > 1) {
+        sscanf(argv[1], "%u", &episodes) ;
+    }
 
     // Training loop: AI plays against a random opponent.
     for (int ep = 0; ep < episodes; ep++) {
@@ -371,7 +540,7 @@ qshell_cmd_tictactrain (SVC_SHELL_IF_T * pif, char** argv, int argc)
                     break;
                 board[action] = ai_player;
 
-                int winner = check_winner(board);
+                int winner = check_winner(board, 0);
                 if (winner == ai_player) {
                     // AI wins: reward +1.
                     train_step(last_ai_board, action, 1.0, board, 1, learning_rate, gamma);
@@ -397,7 +566,7 @@ qshell_cmd_tictactrain (SVC_SHELL_IF_T * pif, char** argv, int argc)
                 int move = legal_moves[rand() % count];
                 board[move] = -ai_player; // Opponent uses the opposite marker.
 
-                int winner = check_winner(board);
+                int winner = check_winner(board, 0);
                 if (winner == -ai_player) {
                     // Opponent wins: AI loses (reward -1).
                     if (ai_waiting_update)
@@ -421,12 +590,12 @@ qshell_cmd_tictactrain (SVC_SHELL_IF_T * pif, char** argv, int argc)
         if (epsilon > 0.05)
             epsilon *= 0.9999;
         if ((ep + 1) % 5000 == 0)
-            printf("Episode %d completed. Epsilon: %.3f\n", ep + 1, epsilon);
+            svc_shell_print (pif, SVC_SHELL_OUT_STD, "Episode %d completed. Epsilon: %.3f\n", ep + 1, epsilon);
     }
 
 
     // Print out the trained weights and biases as C initialization arrays.
-    print_trained_weights();
+    print_trained_weights(pif);
 
     return 0;
 }

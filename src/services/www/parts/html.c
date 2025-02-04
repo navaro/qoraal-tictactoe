@@ -29,7 +29,7 @@
 #include "html.h"
 
 
-#define USE_MUTEX           0
+#define USE_MUTEX           1
 static HTML_EMIT_T *        _html_emit  = 0 ;
 #if USE_MUTEX
 static p_mutex_t            _html_mutex = 0 ;
@@ -47,19 +47,11 @@ uint32_t                    _html_event_mask = 0 ;
 /*===========================================================================*/
 /* part local functions.                                                */
 /*===========================================================================*/
-static int32_t      part_html_cmd (PENGINE_T instance, uint32_t start) ;
-static int32_t      action_html_response (PENGINE_T instance, uint32_t parm, uint32_t flags) ;
-static int32_t      action_html_emit (PENGINE_T instance, uint32_t parm, uint32_t flags) ;
-static int32_t      action_html_subst_emit (PENGINE_T instance, uint32_t parm, uint32_t flags) ;
-static int32_t      action_html_ready (PENGINE_T instance, uint32_t parm, uint32_t flags) ;
-
-
 
 #define HTML_RESPONSE_TYPE_HTML                       0
 #define HTML_RESPONSE_TYPE_TEXT                       1
 #define HTML_RESPONSE_TYPE_CSS                        2
 #define HTML_RESPONSE_TYPE_JSON                       3
-
 
 
 /**
@@ -160,19 +152,27 @@ html_emit_wait (const char * ep, uint16_t event, uint16_t parm, HTTP_USER_T * us
         engine_queue_masked_event (mask, event, parm) ;
     }
 
-    _html_event_mask &= ~mask ;
+    MUTEX_LOCK () ;
     int32_t res = engine_queue_masked_event (mask, ENGINE_EVENT_ID_GET(_html_render), 0) ;
-    if (res != EOK) {        
-        _html_event_mask |= mask ;
-        DBG_ENGINE_LOG(ENGINE_LOG_TYPE_ERROR,
-                "error: failed %d to queue event %d\n", res, ENGINE_EVENT_ID_GET(_html_render)) ;
+    if (res == EOK) {
+        _html_event_mask &= ~mask ;
+    }
+    MUTEX_UNLOCK () ;
 
-    } else {
+    if (res != EOK) {        
+ 
+    }
+    
+    if (res == EOK) {
         os_event_wait_timeout (&_html_emit->complete, 1, mask, 0, OS_MS2TICKS(timeout)) ;
         if (_html_emit->response >= 0) {
             httpserver_chunked_complete (_html_emit->user) ;
 
         }
+
+    } else {
+        DBG_ENGINE_LOG(ENGINE_LOG_TYPE_ERROR,
+            "error: failed %d to queue event %d\n", res, ENGINE_EVENT_ID_GET(_html_render)) ;
 
     }
 
@@ -196,6 +196,7 @@ part_html_cmd (PENGINE_T instance, uint32_t start)
             return os_mutex_create (&_html_mutex) ;
         } else {        
             os_mutex_delete (&_html_mutex) ;
+            _html_mutex = 0 ;
         }
     }   
 #endif
@@ -244,7 +245,7 @@ action_html_response (PENGINE_T instance, uint32_t parm, uint32_t flags)
     if (_html_emit && _html_emit->user) {
         _html_emit->response = parm ;
         user = _html_emit->user ;
-     }
+    }
     MUTEX_UNLOCK () ;
     if (user) {
         res = httpserver_chunked_response (user, 200, 

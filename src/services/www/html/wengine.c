@@ -87,7 +87,7 @@ wengine_handler (HTTP_USER_T *user, uint32_t method, char* endpoint)
 
         if (cmd[1]) event = (uint16_t)atoi(cmd[1]) ;
         if (cmd[2]) parm = (uint16_t)atoi(cmd[2]) ;
-        res = html_emit_wait (cmd[0], event, parm, user, 4000) ;
+        res = html_emit_wait (cmd[0], event, parm, user, 120000) ;
         html_emit_unlock (&_wengine_emit) ;
         if (res = E_NOTFOUND) {  
             res =  httpserver_write_response (user, WSERVER_RESP_CODE_404, HTTP_SERVER_CONTENT_TYPE_HTML,
