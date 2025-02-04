@@ -52,9 +52,9 @@ statemachine tictactoe {
             state html_board_title {
                 action (_state_start, html_emit,                        "<h1>Tic-Tac-Toe</h1>\r\n")
                 action_ld (_state_start, [a], tictac_status)
-                action_eq (_state_start, TICTAC_DRAW, html_emit,        "<h1>DRAW!</h1>\r\n")
-                action_eq (_state_start, TICTAC_PLAYER_WIN, html_emit,  "<h1>Player Wins!</h1>\r\n")
-                action_eq (_state_start, TICTAC_AI_WIN, html_emit,      "<h1>AI Wins!</h1>\r\n")
+                action_eq (_state_start, TICTAC_DRAW, html_emit,        "<div id=\"winner-message\" class=\"winner\"> Draw </div>\r\n\r\n")
+                action_eq (_state_start, TICTAC_PLAYER_WIN, html_emit,  "<div id=\"winner-message\" class=\"winner\"> 👑 Player Wins! 👑 </div>\r\n")
+                action_eq (_state_start, TICTAC_AI_WIN, html_emit,      "<div id=\"winner-message\" class=\"winner\"> 🎉 AI Wins! 🎉 </div>\r\n")
                 event (_state_start, html_board_cell)
 
             }
@@ -267,6 +267,21 @@ statemachine tictaccss {
             ".cell.blink::before,\r\n"
             ".cell.blink::after {\r\n"
             "    animation: blink-symbol 0.8s step-start 3;\r\n"
+            "}\r\n"            
+            "@keyframes glow {\r\n"   
+            "    0%, 100% { text-shadow: 0 0 10px rgba(255, 255, 0, 0.8), 0 0 20px rgba(255, 165, 0, 0.6); }\r\n"   
+            "    50% { text-shadow: 0 0 20px rgba(255, 255, 0, 1), 0 0 40px rgba(255, 165, 0, 0.9); }\r\n"   
+            "}\r\n"   
+            ".winner {\r\n"   
+            "    font-size: 2.5em;\r\n"   
+            "    font-weight: bold;\r\n"   
+            "    color: #ffcc00;\r\n"   
+            "    text-align: center;\r\n"   
+            "    margin-bottom: 15px;\r\n"   
+            "    animation: glow 1s infinite alternate;\r\n"   
+            "}\r\n"   
+            ".hidden {\r\n"   
+            "    display: none;\r\n"   
             "}\r\n")
 
             event (_state_start, ready)
