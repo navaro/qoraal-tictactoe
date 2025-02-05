@@ -156,7 +156,8 @@ On system startup, the Tic-Tac AI initializes with a model trained over 200,000 
 So dive in and experience how structured state machines can transform your approach to rendering, interactivity, and even game logic!
 
 ### Quick Start
-The demo application can be compiled using the POSIX port for evaluation. Currently supported RTOS options include ChibiOS, FreeRTOS, and ThreadX.
+The demo application can be compiled using the POSIX port for evaluation. 
+Currently supported RTOS options include ChibiOS, FreeRTOS, and ThreadX, if you have an IP stack like LwIP.
 
 Since IP connectivity is required, you cannot run this in GitHub Codespaces.
 To run it locally on Windows/Linux, follow these steps:
