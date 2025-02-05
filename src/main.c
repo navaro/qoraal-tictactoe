@@ -62,7 +62,7 @@ main_init (void)
      */
     static SVC_THREADS_T thd ;
 
-    platform_init (23*1024*1024) ; // 32MB FLASH
+    platform_init (0) ;
     qoraal_init_default (&_qoraal_cfg, _qoraal_services_list) ;
     qoraal_http_init_default () ;
 
@@ -97,7 +97,8 @@ int main( void )
      */
 
     /*
-     * For the demo, we wait for the shell to be exited with the "exit" command.
+     * For the demo, we wait for the wait for the web server to shutdown or the 
+    *  shell to be exited with the "exit" command.
      */
     console_wait_for_exit (QORAAL_SERVICE_WWW) ;
     svc_service_stop_timeout (svc_service_get(QORAAL_SERVICE_WWW), 1200) ;

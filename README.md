@@ -38,12 +38,13 @@ It’s nice to make your acquaintance.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </div>
 <br>
 <div align="center">
-First, let me show you this…
+first, let me show you this
 <br>
 <br>
 <div align="left">
 
-```
+
+```cpp
 decl_name       "tic-tac-toe"
 decl_version    1
 
@@ -51,8 +52,8 @@ decl_version    1
 decl_events {
     _tictac_tick
     _tictac_restart
+    
 }
-
 
 statemachine tictactoe {
 
@@ -62,14 +63,16 @@ statemachine tictactoe {
         enter (html_ready)
         action (_tictac_restart, tictac_restart)
         action (_tictac_tick, tictac_play, [e])
-        action (_html_render, html_response, HTML)
         event (_html_render, html_head)
+        exit (html_response, HTML)
+
     }
 
     state html {
         enter (html_emit,       "<!DOCTYPE html>\r\n"
                                 "<html lang=\"en\">\r\n")
         exit (html_emit,        "</html>\r\n")
+
     }
 
     super html {
@@ -79,8 +82,9 @@ statemachine tictactoe {
                                 "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n"
                                 "<title>Tic-Tac-Toe</title>\r\n"
                                 "<link rel=\"stylesheet\" href=\"/engine/tictaccss\">\r\n")
-            exit (html_emit,    "</head>\r\n")
             event (_state_start, html_board_title)
+            exit (html_emit,    "</head>\r\n")
+
         }
         
     }
@@ -93,6 +97,7 @@ statemachine tictactoe {
                                 "</body>")
 
         }
+
         super html_body {
 
             state html_board_title {
@@ -115,9 +120,11 @@ statemachine tictactoe {
 
                 state html_board_cell {
                     action_ld (_state_start, [a], tictac_cell, [r])
-                    action_eq (_state_start, TICTAC_OPEN,   html_subst_emit,    "<div class=\"cell\"><a href=\"/engine/tictactoe/[_tictac_tick]/[r]\" class=\"invisible-link\"></a></div>\r\n")
-                    action_eq (_state_start, TICTAC_PLAYER,         html_emit,  "<div class=\"cell x\"></div>\r\n")
-                    action_eq (_state_start, TICTAC_AI,             html_emit,  "<div class=\"cell o\"></div>\r\n")
+                    action_eq (_state_start, TICTAC_OPEN,   html_subst_emit,"<div class=\"cell\">"
+                                                                            "<a href=\"/engine/tictactoe/[_tictac_tick]/[r]\" "
+                                                                            "class=\"invisible-link\"></a></div>\r\n")
+                    action_eq (_state_start, TICTAC_PLAYER,     html_emit,  "<div class=\"cell x\"></div>\r\n")
+                    action_eq (_state_start, TICTAC_AI,         html_emit,  "<div class=\"cell o\"></div>\r\n")
                     action_eq (_state_start, TICTAC_PLAYER_BLINK,   html_emit,  "<div class=\"cell x blink\"></div>\r\n")
                     action_eq (_state_start, TICTAC_AI_BLINK,       html_emit,  "<div class=\"cell o blink\"></div>\r\n")
                     action (_state_start, r_inc, 9)
@@ -125,10 +132,20 @@ statemachine tictactoe {
                     event_if (_state_start, ready)
 
                 }
-            }            
-        }
-    }
 
+            } 
+
+        }
+
+    }
 
 }
 ```
+
+### Lets get into it!
+At its core, a hierarchical state machine is a powerful tool for structuring logic in a modular, maintainable way. When you use it to render structured text like HTML, you unlock an elegant, flexible method for building dynamic web applications. 
+The __Qoraal Engine__ framework leverages this concept brilliantly—by mapping state transitions to HTML rendering, it turns what could be a tangle of code into a clear, hierarchical process. This not only keeps your code neat and scalable but also makes development fun, as every state tells a part of your application's story.
+
+__Engine__ goes even further by integrating backend logic, as demonstrated in the tic-tac-toe example. Functions `tictac_play`, `tictac_status`, and `tictac_cell` connect with the AI game backend, handling moves, checking game status, while `html_ready`, `html_response` and `html_emit` update the board rendering. The beauty of __Engine__ is in how it unifies these components: the state machine manages the HTML output and user interactions, while the backend logic processes the game mechanics, resulting in a cohesive and dynamic gaming experience.
+
+Dive in and experience how structured state machines can transform your approach to rendering, interactivity, and even game logic!

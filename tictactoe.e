@@ -16,8 +16,8 @@ statemachine tictactoe {
         enter (html_ready)
         action (_tictac_restart, tictac_restart)
         action (_tictac_tick, tictac_play, [e])
-        action (_html_render, html_response, HTML)
         event (_html_render, html_head)
+        exit (html_response, HTML)
     }
 
     state html {
@@ -33,8 +33,8 @@ statemachine tictactoe {
                                 "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n"
                                 "<title>Tic-Tac-Toe</title>\r\n"
                                 "<link rel=\"stylesheet\" href=\"/engine/tictaccss\">\r\n")
-            exit (html_emit,    "</head>\r\n")
             event (_state_start, html_board_title)
+            exit (html_emit,    "</head>\r\n")
         }
         
     }
@@ -69,9 +69,11 @@ statemachine tictactoe {
 
                 state html_board_cell {
                     action_ld (_state_start, [a], tictac_cell, [r])
-                    action_eq (_state_start, TICTAC_OPEN,   html_subst_emit,    "<div class=\"cell\"><a href=\"/engine/tictactoe/[_tictac_tick]/[r]\" class=\"invisible-link\"></a></div>\r\n")
-                    action_eq (_state_start, TICTAC_PLAYER,         html_emit,  "<div class=\"cell x\"></div>\r\n")
-                    action_eq (_state_start, TICTAC_AI,             html_emit,  "<div class=\"cell o\"></div>\r\n")
+                    action_eq (_state_start, TICTAC_OPEN,   html_subst_emit,"<div class=\"cell\">"
+                                                                            "<a href=\"/engine/tictactoe/[_tictac_tick]/[r]\" "
+                                                                            "class=\"invisible-link\"></a></div>\r\n")
+                    action_eq (_state_start, TICTAC_PLAYER,     html_emit,  "<div class=\"cell x\"></div>\r\n")
+                    action_eq (_state_start, TICTAC_AI,         html_emit,  "<div class=\"cell o\"></div>\r\n")
                     action_eq (_state_start, TICTAC_PLAYER_BLINK,   html_emit,  "<div class=\"cell x blink\"></div>\r\n")
                     action_eq (_state_start, TICTAC_AI_BLINK,       html_emit,  "<div class=\"cell o blink\"></div>\r\n")
                     action (_state_start, r_inc, 9)
@@ -152,7 +154,7 @@ statemachine tictaccss {
             "    align-items: center;\r\n"
             "    justify-content: center;\r\n"
             "    height: 100vh;\r\n"
-            "    font-family: \"Lucida Sans\", \"Lucida Sans Regular\", \"Lucida Grande\", sans-serif;\r\n"
+            "    font-family: \"Comic Sans MS\", cursive, sans-serif;\r\n"
             "    background: radial-gradient(circle, #1e1e2e 0%, #0c0917 90%);\r\n"
             "    color: #e2e2e2;\r\n"
             "    margin: 0;\r\n"
@@ -236,6 +238,7 @@ statemachine tictaccss {
             "}\r\n"
             "\r\n"
             ".restart-btn {\r\n"
+            "    font-family: inherit;\r\n"
             "    margin-top: 20px;\r\n"
             "    padding: 10px 20px;\r\n"
             "    font-size: 1.2em;\r\n"
