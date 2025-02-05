@@ -38,7 +38,7 @@ It’s nice to make your acquaintance.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </div>
 <br>
 <div align="center">
-First, let me show you this…
+First, let me show you this:
 <br>
 <br>
 <div align="left">
