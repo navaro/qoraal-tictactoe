@@ -166,7 +166,7 @@ To run it locally on Windows/Linux, follow these steps:
     - **Windows**: `> build_and_run.bat`
     - **Linux**: `$ sh ./build_and_run.sh`
 3. When the application starts, a shell will open, displaying startup logs.
-4. If running locally, access the web interface at: http://127.0.0.1:8080 (or use your build machine’s IP if running remotely).
+4. If building locally you can access the web interface at: http://127.0.0.1:8080 (or use your build machine’s IP if running remotely).
 
 That’s it. 🚀
 
