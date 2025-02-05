@@ -1,6 +1,7 @@
 # Collect all test source files
 set(TEST_SRCS
     main.c
+    tictactoe.c
     services/engine.c
     services/www/wserver_inst.c
     services/www/html/wabout.c
@@ -13,7 +14,6 @@ set(TEST_SRCS
     services/www/image/wimage.c
     services/www/css/wcss.c
     services/www/parts/html.c
-    services/www/parts/tictactoe.c
 )
 
 # Add the executable target

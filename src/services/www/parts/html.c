@@ -116,6 +116,7 @@ html_emit_delete (HTML_EMIT_T* emit)
 int32_t 
 html_emit_lock (HTML_EMIT_T* emit, uint32_t timeout)
 {
+    if (!_html_mutex) return E_UNEXP ;
     int32_t res = os_sem_wait_timeout (&emit->lock, OS_MS2TICKS(timeout)) ;
     if (res == EOK) {
         _html_emit = emit ;
@@ -134,13 +135,16 @@ html_emit_unlock (HTML_EMIT_T* emit)
 int32_t 
 html_emit_wait (const char * ep, uint16_t event, uint16_t parm, HTTP_USER_T * user, uint32_t timeout)
 {
-    if (!_html_event_mask || !_html_emit) return E_UNEXP ;
+    if (!_html_emit || !_html_mutex) return E_UNEXP ;
     if (!user) return E_PARM ;
 
     uint32_t mask ;
+    int32_t idx ;
+    if (ep == 0) idx = 0 ;
+    else idx = engine_statemachine_idx (ep) ;
+    if (idx < 0) return idx ;
     MUTEX_LOCK () ;
-    if (ep == 0) mask = _html_event_mask & 1 ;
-    else mask = _html_event_mask & (1 << engine_statemachine_idx (ep)) ;
+    mask = _html_event_mask & (1 << idx) ;
     MUTEX_UNLOCK () ;
 
     if (!mask) return E_NOTFOUND ;
@@ -159,10 +163,6 @@ html_emit_wait (const char * ep, uint16_t event, uint16_t parm, HTTP_USER_T * us
     }
     MUTEX_UNLOCK () ;
 
-    if (res != EOK) {        
- 
-    }
-    
     if (res == EOK) {
         os_event_wait_timeout (&_html_emit->complete, 1, mask, 0, OS_MS2TICKS(timeout)) ;
         if (_html_emit->response >= 0) {
@@ -175,7 +175,6 @@ html_emit_wait (const char * ep, uint16_t event, uint16_t parm, HTTP_USER_T * us
             "error: failed %d to queue event %d\n", res, ENGINE_EVENT_ID_GET(_html_render)) ;
 
     }
-
 
     return EOK ;
 }
@@ -223,7 +222,6 @@ action_html_response (PENGINE_T instance, uint32_t parm, uint32_t flags)
             return EFAIL ;
        
     }
-
 
     const   HTTP_HEADER_T headers[]   = { {"Cache-Control", "no-cache"} };
     const HTTP_HEADER_T * pheaders = 0 ;
