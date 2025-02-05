@@ -43,7 +43,7 @@ First, let me show you this:
 <br>
 <div align="left">
 
-```
+```cpp
 decl_name       "tic-tac-toe"
 decl_version    1
 
