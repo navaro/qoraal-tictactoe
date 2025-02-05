@@ -1,6 +1,6 @@
 <div align="center">
 
-# qoraal-tictactoe
+# Qoraal Tic-Tac-Toe
 
 <div align="left">
 
@@ -141,8 +141,9 @@ statemachine tictactoe {
 
 }
 ```
+<br>
 
-### Lets get into it!
+### Lets get into it
 At its core, a hierarchical state machine is a powerful tool for structuring logic in a modular, maintainable way. When you use it to render structured text like HTML, you unlock an elegant, flexible method for building dynamic web applications. 
 The __Qoraal Engine__ framework leverages this concept brilliantly—by mapping state transitions to HTML rendering, it turns what could be a tangle of code into a clear, hierarchical process. This not only keeps your code neat and scalable but also makes development fun, as every state tells a part of your application's story.
 
