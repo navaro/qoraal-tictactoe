@@ -29,7 +29,7 @@ It’s just down the hall, to the right.
 
 ### Follow me...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
-<br><br>
+<br>
 
 </div>
 
@@ -38,7 +38,7 @@ It’s just down the hall, to the right.
 </div>
 <br>
 <div align="center">
-But first, let me show you this…
+First, let me show you this…
 <br>
 <br>
 <div align="left">
