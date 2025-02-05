@@ -16,8 +16,8 @@ statemachine tictactoe {
         enter (html_ready)
         action (_tictac_restart, tictac_restart)
         action (_tictac_tick, tictac_play, [e])
-        action (_html_render, html_response, HTML)
         event (_html_render, html_head)
+        exit (html_response, HTML)
     }
 
     state html {
@@ -33,8 +33,8 @@ statemachine tictactoe {
                                 "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n"
                                 "<title>Tic-Tac-Toe</title>\r\n"
                                 "<link rel=\"stylesheet\" href=\"/engine/tictaccss\">\r\n")
-            exit (html_emit,    "</head>\r\n")
             event (_state_start, html_board_title)
+            exit (html_emit,    "</head>\r\n")
         }
         
     }
