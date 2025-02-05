@@ -21,8 +21,8 @@
 
 SVC_SERVICE_LIST_START(_qoraal_services_list)
 SVC_SERVICE_RUN_DECL("shell",  console_service_run, console_service_ctrl, 0, 6000, OS_THREAD_PRIO_8, QORAAL_SERVICE_SHELL, SVC_SERVICE_FLAGS_AUTOSTART)
-SVC_SERVICE_RUN_DECL("www",  wserver_service_run, wserver_service_ctrl, 0, 6000, OS_THREAD_PRIO_4, QORAAL_SERVICE_WWW, SVC_SERVICE_FLAGS_AUTOSTART)
 SVC_SERVICE_DECL("engine", engine_service_ctrl, 0, QORAAL_SERVICE_ENGINE, SVC_SERVICE_FLAGS_AUTOSTART)
+SVC_SERVICE_RUN_DECL("www",  wserver_service_run, wserver_service_ctrl, 0, 6000, OS_THREAD_PRIO_4, QORAAL_SERVICE_WWW, SVC_SERVICE_FLAGS_AUTOSTART)
 SVC_SERVICE_LIST_END()
 
 static const QORAAL_CFG_T           _qoraal_cfg = { .malloc = platform_malloc, .free = platform_free, .debug_print = platform_print, .debug_assert = platform_assert, .current_time = platform_current_time, .rand = platform_rand, .rand = platform_rand, .wdt_kick = platform_wdt_kick};
