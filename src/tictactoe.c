@@ -140,6 +140,8 @@ int32_t action_tictac_play(PENGINE_T instance, uint32_t parm, uint32_t flags)
         return EFAIL;
     if (check_winner(_tictactoe_board, _tictactoe_board_blink))
         return EOK;
+    if (board_full(_tictactoe_board))
+        return EOK ;
 
     _tictactoe_board[parm] = -1;
     if (check_winner(_tictactoe_board, _tictactoe_board_blink)) {
@@ -147,6 +149,13 @@ int32_t action_tictac_play(PENGINE_T instance, uint32_t parm, uint32_t flags)
                 "TIC   : : Player wins!") ;
         return EOK;
     }
+    if (board_full(_tictactoe_board)) {
+            DBG_MESSAGE_TICTACTOE (DBG_MESSAGE_SEVERITY_REPORT, 
+                "TIC   : : Draw") ;
+        return EOK ;
+
+    }
+
 
     int action = choose_move_epsilon(_tictactoe_board, 0.0);
     if (action < 0)
@@ -158,6 +167,11 @@ int32_t action_tictac_play(PENGINE_T instance, uint32_t parm, uint32_t flags)
     if (check_winner(_tictactoe_board, _tictactoe_board_blink)) {
             DBG_MESSAGE_TICTACTOE (DBG_MESSAGE_SEVERITY_REPORT, 
                 "TIC   : : AI wins!") ;
+
+    }
+    if (board_full(_tictactoe_board)) {
+            DBG_MESSAGE_TICTACTOE (DBG_MESSAGE_SEVERITY_REPORT, 
+                "TIC   : : Draw") ;
 
     }
 
