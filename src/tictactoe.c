@@ -8,9 +8,10 @@
  *      and shell command declarations.
  *   3. Engine Constants & Actions: Implements game actions (restart, play,
  *      status query, cell query) for the embedded engine.
- *   4. Neural Network for AI: Implements a simple neural network and Q-learning
- *      training functions to choose moves.
- *   5. Shell Commands: Commands to run a demonstration game and training loop.
+ *   4. Neural Network for AI: Implements a simple neural network and 
+ *      Q-learning training functions to choose moves (Courtesy ChatGPT o3).
+ *   5. Shell Commands: Commands to run a demonstration game and training loop
+ *      from the console.
  *
  * Enjoy the mix of hardcore AI and classic Tic Tac Toe. If you’re not here for
  * the real deal, step aside!
@@ -224,7 +225,7 @@ int32_t action_tictac_cell(PENGINE_T instance, uint32_t parm, uint32_t flags)
 }
 
 /*
- * Section: Neural Network for Tic Tac Toe AI
+ * Section: Neural Network for Tic Tac Toe AI (Courtesy ChatGPT o3)
  *
  * This section defines the neural network used for the AI's move selection.
  * It includes:
