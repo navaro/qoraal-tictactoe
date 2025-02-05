@@ -12,16 +12,13 @@
 #### __You finally arrived.__
 
 ##### I was beginning to wonder if you would.  
-It’s nice to make your acquaintance—  
-though I feel I’ve known you before.  
-Perhaps it was only a dream.
+It’s nice to make your acquaintance.
 
 </div>
 
 <div align="right">
 
 #### Shall I take your coat?  
-You won’t be needing it where we’re going.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
 </div>
 
