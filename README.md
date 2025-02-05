@@ -43,6 +43,7 @@ First, let me show you this:
 <br>
 <div align="left">
 
+
 ```cpp
 decl_name       "tic-tac-toe"
 decl_version    1
@@ -140,3 +141,11 @@ statemachine tictactoe {
 
 }
 ```
+
+### Introduction
+At its core, a hierarchical state machine is a powerful tool for structuring logic in a modular, maintainable way. When you use it to render structured text like HTML, you unlock an elegant, flexible method for building dynamic web applications. 
+The ___Qoraal Engine___ framework leverages this concept brilliantly—by mapping state transitions to HTML rendering, it turns what could be a tangle of code into a clear, hierarchical process. This not only keeps your code neat and scalable but also makes development fun, as every state tells a part of your application's story.
+
+Engine goes even further by integrating backend logic, as demonstrated in the tic-tac-toe example. Functions `tictac_play`, `tictac_status`, and `tictac_cell` connect with the AI game backend, handling moves, checking game status, and updating the board. The beauty of ___Engine___ is in how it unifies these components: the state machine manages the HTML output and user interactions, while the backend logic processes the game mechanics, resulting in a cohesive and dynamic gaming experience.
+
+Dive in and experience how structured state machines can transform your approach to rendering, interactivity, and even game logic!
