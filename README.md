@@ -154,3 +154,19 @@ On system startup, the Tic-Tac AI initializes with a model trained over 200,000 
 :bulb: Tip: You can retrain your AI using the console command `tictactrain x`, where `x` is the number of iterations you want to train it for.
 
 So dive in and experience how structured state machines can transform your approach to rendering, interactivity, and even game logic!
+
+### Quick Start
+The demo application can be compiled using the POSIX port for evaluation. Currently supported RTOS options include ChibiOS, FreeRTOS, and ThreadX.
+
+Since IP connectivity is required, you cannot run this in GitHub Codespaces.
+To run it locally on Windows/Linux, follow these steps:
+
+1. Open your development environment and checkout the repository.
+2. Run the appropriate script based on your OS:
+    - **Windows**: `> build_and_run.bat`
+    - **Linux**: `$ sh ./build_and_run.sh`
+3. When the application starts, a shell will open, displaying startup logs.
+4. If running locally, access the web interface at: http://127.0.0.1:8080 (or use your build machine’s IP if running remotely).
+
+That’s it. 🚀
+
