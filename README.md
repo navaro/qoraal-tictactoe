@@ -12,17 +12,17 @@
 #### __You finally arrived.__
 
 ##### I was beginning to wonder if you would.  
-It’s nice to make your acquaintance.
+It’s nice to make your acquaintance.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
 </div>
 
 <div align="right">
 
-#### Shall I take your coat?  
+#### Shall I take your coat?  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
 </div>
 
-It’s just down the hall, to the right.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; It’s just down the hall, to the right.
 
 <div align="center">
 
