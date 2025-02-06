@@ -90,8 +90,8 @@ statemachine tictactoe {
     super html {
         state html_head {
             /*
-             * Engine machine language commands are single-line. However, multi-line text blocks are allowed.
-             * Ensure the closing bracket is on the same line as the final line of text.
+             * Engine machine language commands are single-line. However, multi-line text blocks
+             * are allowed. Ensure the closing bracket is on the same line as the final line of text.
              */
             enter (html_emit,   "<head>\r\n"
                                 "<meta charset=\"UTF-8\">\r\n"
@@ -112,8 +112,8 @@ statemachine tictactoe {
         state html_body {
             enter (html_emit,   "<body>\r\n")
             /*
-             * Use html_subst_emit to perform token substitution on identifiers in square brackets ([]).
-             * Escape brackets if you don’t intend to substitute.
+             * Use html_subst_emit to perform token substitution on identifiers in square
+             * brackets ([]). Escape brackets if you don’t intend to substitute.
              */
             exit (html_subst_emit,    "<button class=\"restart-btn\" onclick=\"window.location.href='/engine/tictactoe/[_tictac_restart]'\">Restart</button>\r\n"
                                 "<button class=\"restart-btn\" onclick=\"window.location.href='/index'\">Take Me Home</button>"
