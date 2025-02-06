@@ -149,7 +149,8 @@ statemachine tictactoe {
                     action_ld (_state_start, [a], tictac_cell, [r])
                     /*
                      * If the cell is still open, create a clickable link that triggers a _tictac_tick event.
-                     * The cell number is passed in the event register [e].
+                     * The cell number [r], is passed in the event register [e], with the event when the link
+                     * is clicked.
                      */
                     action_eq (_state_start, TICTAC_OPEN,   html_subst_emit,"<div class=\"cell\">"
                                                                             "<a href=\"/engine/tictactoe/[_tictac_tick]/[r]\" "
