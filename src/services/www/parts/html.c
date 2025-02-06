@@ -295,7 +295,7 @@ html_emit_text (PENGINE_T instance, uint32_t parm, uint32_t flags, bool strsub)
             if (strsub) {
                 int32_t dstlen = strsub_parse_get_dst_length (0, str, len) ;
                 if (dstlen > 0) {
-                    char * newstr = qoraal_malloc(QORAAL_HeapAuxiliary, dstlen) ;
+                    newstr = qoraal_malloc(QORAAL_HeapAuxiliary, dstlen) ;
                     if (newstr) {
                         len = strsub_parse_string_to (0, str, len, newstr, dstlen) ;
                         str = newstr ;
