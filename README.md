@@ -18,11 +18,11 @@ It’s a pleasure to finally make your acquaintance.&nbsp;&nbsp;&nbsp;&nbsp;&nbs
 
 <div align="right">
 
-#### Let me take your coat. You won't be needing it. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+#### Here, let me take that off your hands. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
 </div>
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; It’s just down the hall, to the right.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Third door on the left... if you dare.
 
 <div align="center">
 
