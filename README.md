@@ -52,18 +52,26 @@ decl_version    1
 decl_events {
     _tictac_tick
     _tictac_restart
-    
 }
+
 
 statemachine tictactoe {
 
     startstate ready
 
     state ready {
+        /*
+         * Entering the ready state we signal that we are ready (html_ready) to render 
+         * html should we receive the _html_render event.
+         */
         enter (html_ready)
         action (_tictac_restart, tictac_restart)
         action (_tictac_tick, tictac_play, [e])
         event (_html_render, html_head)
+        /*
+         * On exit, begin a "text/html" response. All subsequent html_emit calls will 
+         * add to the response content.
+         */
         exit (html_response, HTML)
 
     }
@@ -71,12 +79,20 @@ statemachine tictactoe {
     state html {
         enter (html_emit,       "<!DOCTYPE html>\r\n"
                                 "<html lang=\"en\">\r\n")
+        /*
+         * When we exit the html super state, to return to the "ready" state again, we 
+         * close the HTML document by emitting the closing </html> tag.
+         */
         exit (html_emit,        "</html>\r\n")
 
     }
 
     super html {
         state html_head {
+            /*
+             * Engine machine language commands are single-line. However, multi-line text blocks are allowed.
+             * Ensure the closing bracket is on the same line as the final line of text.
+             */
             enter (html_emit,   "<head>\r\n"
                                 "<meta charset=\"UTF-8\">\r\n"
                                 "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n"
@@ -90,9 +106,16 @@ statemachine tictactoe {
     }
 
     super html {
+        /*
+         * States can be nested. You can either nest them directly or repeat the "super" identifier.
+         */
         state html_body {
             enter (html_emit,   "<body>\r\n")
-            exit (html_emit,    "<button class=\"restart-btn\" onclick=\"window.location.href='/engine/tictactoe/[_tictac_restart]'\">Restart</button>\r\n"
+            /*
+             * Use html_subst_emit to perform token substitution on identifiers in square brackets ([]).
+             * Escape brackets if you don’t intend to substitute.
+             */
+            exit (html_subst_emit,    "<button class=\"restart-btn\" onclick=\"window.location.href='/engine/tictactoe/[_tictac_restart]'\">Restart</button>\r\n"
                                 "<button class=\"restart-btn\" onclick=\"window.location.href='/index'\">Take Me Home</button>"
                                 "</body>")
 
@@ -111,15 +134,23 @@ statemachine tictactoe {
             }
            
             state html_board {
+                /*
+                 * Reset the register [r], used a cell counter, to zero before rendering the board.
+                 */
                 enter (r_load, 0)
                 enter (html_emit,   "<div class=\"board\">\r\n")
                 exit (html_emit,    "</div>\r\n")
 
             }
+
             super html_board {
 
                 state html_board_cell {
                     action_ld (_state_start, [a], tictac_cell, [r])
+                    /*
+                     * If the cell is still open, create a clickable link that triggers a _tictac_tick event.
+                     * The cell number is passed in the event register [e].
+                     */
                     action_eq (_state_start, TICTAC_OPEN,   html_subst_emit,"<div class=\"cell\">"
                                                                             "<a href=\"/engine/tictactoe/[_tictac_tick]/[r]\" "
                                                                             "class=\"invisible-link\"></a></div>\r\n")
@@ -127,13 +158,18 @@ statemachine tictactoe {
                     action_eq (_state_start, TICTAC_AI,         html_emit,  "<div class=\"cell o\"></div>\r\n")
                     action_eq (_state_start, TICTAC_PLAYER_BLINK,   html_emit,  "<div class=\"cell x blink\"></div>\r\n")
                     action_eq (_state_start, TICTAC_AI_BLINK,       html_emit,  "<div class=\"cell o blink\"></div>\r\n")
+                    /*
+                     * After processing a cell, the register [r] increments until it reaches 9.
+                     * Once [r] hits 9, the [a] accumulator is set, and we return to the "ready" state (event_if).
+                     * Otherwise, we continue rendering the next cell (event_nt).
+                     */
                     action (_state_start, r_inc, 9)
                     event_nt (_state_start, html_board_cell)
                     event_if (_state_start, ready)
 
                 }
 
-            } 
+            }     
 
         }
 
