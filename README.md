@@ -5,7 +5,7 @@
 <div align="center">
 
 
-### this is what it all was for &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; third door on the left &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if you dare
+### This is what it all was for. Third door on the left, if you dare...
 
 
 <div align="center">
@@ -22,7 +22,7 @@
 <br>
 <div align="center">
 
-#### first, have a look at this
+#### Check this out first—then hit me.
 
 
 
