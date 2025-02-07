@@ -22,8 +22,8 @@ statemachine tictactoe {
         action (_tictac_tick, tictac_play, [e])
         event (_html_render, html_head)
         /*
-         * On exit, begin a "text/html" response. All subsequent html_emit calls will 
-         * add to the response content.
+         * The state exit action here wil begin the "text/html" response. All subsequent
+         * html_emit calls will add to the response content.
          */
         exit (html_response, HTML)
 
@@ -33,8 +33,8 @@ statemachine tictactoe {
         enter (html_emit,       "<!DOCTYPE html>\r\n"
                                 "<html lang=\"en\">\r\n")
         /*
-         * When we exit the html super state, to return to the "ready" state again, we 
-         * close the HTML document by emitting the closing </html> tag.
+         * When we exit the html super state, to return to the "ready" state again, the 
+         * exit action will close the HTML document by emitting the closing </html> tag.
          */
         exit (html_emit,        "</html>\r\n")
 
@@ -43,8 +43,8 @@ statemachine tictactoe {
     super html {
         state html_head {
             /*
-             * Engine machine language commands are single-line. However, multi-line text blocks are allowed.
-             * Ensure the closing bracket is on the same line as the final line of text.
+             * Engine machine language commands are single-line. However, multi-line text blocks are
+             * allowed. Ensure the closing bracket is on the same line as the final line of text.
              */
             enter (html_emit,   "<head>\r\n"
                                 "<meta charset=\"UTF-8\">\r\n"
@@ -88,7 +88,7 @@ statemachine tictactoe {
            
             state html_board {
                 /*
-                 * Reset the register [r], used a cell counter, to zero before rendering the board.
+                 * Reset the register [r], used as cell counter, to zero before rendering the board.
                  */
                 enter (r_load, 0)
                 enter (html_emit,   "<div class=\"board\">\r\n")

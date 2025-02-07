@@ -2,32 +2,15 @@
 
 # Qoraal Tic-Tac-Toe
 
-<div align="left">
-
-
-### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is what it all was for
-
 <div align="center">
 
-#### __You finally arrived.__
 
-##### I was beginning to wonder if you would.  
-It’s a pleasure to finally make your acquaintance.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+### this is what it all was for &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; third door on the left &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if you dare
 
-</div>
-
-<div align="right">
-
-#### Here, let me take that off your hands. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-
-</div>
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Third door on the left... if you dare.
 
 <div align="center">
 
 
-### Follow me...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
 <br>
 
@@ -38,9 +21,11 @@ It’s a pleasure to finally make your acquaintance.&nbsp;&nbsp;&nbsp;&nbsp;&nbs
 </div>
 <br>
 <div align="center">
-first, let me show you this
-<br>
-<br>
+
+#### first, have a look at this
+
+
+
 <div align="left">
 
 
@@ -69,8 +54,8 @@ statemachine tictactoe {
         action (_tictac_tick, tictac_play, [e])
         event (_html_render, html_head)
         /*
-         * On exit, begin a "text/html" response. All subsequent html_emit calls will 
-         * add to the response content.
+         * The state exit action here wil begin the "text/html" response. All subsequent
+         * html_emit calls will add to the response content.
          */
         exit (html_response, HTML)
 
@@ -80,8 +65,8 @@ statemachine tictactoe {
         enter (html_emit,       "<!DOCTYPE html>\r\n"
                                 "<html lang=\"en\">\r\n")
         /*
-         * When we exit the html super state, to return to the "ready" state again, we 
-         * close the HTML document by emitting the closing </html> tag.
+         * When we exit the html super state, to return to the "ready" state again, the 
+         * exit action will close the HTML document by emitting the closing </html> tag.
          */
         exit (html_emit,        "</html>\r\n")
 
@@ -90,8 +75,8 @@ statemachine tictactoe {
     super html {
         state html_head {
             /*
-             * Engine machine language commands are single-line. However, multi-line text blocks
-             * are allowed. Ensure the closing bracket is on the same line as the final line of text.
+             * Engine machine language commands are single-line. However, multi-line text blocks are
+             * allowed. Ensure the closing bracket is on the same line as the final line of text.
              */
             enter (html_emit,   "<head>\r\n"
                                 "<meta charset=\"UTF-8\">\r\n"
@@ -112,8 +97,8 @@ statemachine tictactoe {
         state html_body {
             enter (html_emit,   "<body>\r\n")
             /*
-             * Use html_subst_emit to perform token substitution on identifiers in square
-             * brackets ([]). Escape brackets if you don’t intend to substitute.
+             * Use html_subst_emit to perform token substitution on identifiers in square brackets ([]).
+             * Escape brackets if you don’t intend to substitute.
              */
             exit (html_subst_emit,    "<button class=\"restart-btn\" onclick=\"window.location.href='/engine/tictactoe/[_tictac_restart]'\">Restart</button>\r\n"
                                 "<button class=\"restart-btn\" onclick=\"window.location.href='/index'\">Take Me Home</button>"
@@ -135,7 +120,7 @@ statemachine tictactoe {
            
             state html_board {
                 /*
-                 * Reset the register [r], used a cell counter, to zero before rendering the board.
+                 * Reset the register [r], used as cell counter, to zero before rendering the board.
                  */
                 enter (r_load, 0)
                 enter (html_emit,   "<div class=\"board\">\r\n")
@@ -149,8 +134,7 @@ statemachine tictactoe {
                     action_ld (_state_start, [a], tictac_cell, [r])
                     /*
                      * If the cell is still open, create a clickable link that triggers a _tictac_tick event.
-                     * The cell number [r], is passed in the event register [e], with the event when the link
-                     * is clicked.
+                     * The cell number is passed in the event register [e].
                      */
                     action_eq (_state_start, TICTAC_OPEN,   html_subst_emit,"<div class=\"cell\">"
                                                                             "<a href=\"/engine/tictactoe/[_tictac_tick]/[r]\" "
@@ -178,19 +162,16 @@ statemachine tictactoe {
 
 }
 ```
-<br>
+
 
 ### Lets get into it
-At its core, a hierarchical state machine is a powerful tool for structuring logic in a modular, maintainable way. When you use it to render structured text like HTML, you unlock an elegant, flexible method for building dynamic web applications. 
-The __Qoraal Engine__ framework leverages this concept brilliantly—by mapping state transitions to HTML rendering, it turns what could be a tangle of code into a clear, hierarchical process. This not only keeps your code neat and scalable but also makes development fun, as every state tells a part of your application's story.
+At its core, a hierarchical state machine can be powerful tool for structuring logic in a modular, maintainable way. When you use it to render structured text like HTML, you unlock flexible method for building dynamic web applications.
 
-__Engine__ goes even further by integrating backend logic, as demonstrated in the tic-tac-toe example. Functions `tictac_play`, `tictac_status`, and `tictac_cell` connect with the AI game backend, handling moves, checking game status, while `html_ready`, `html_response` and `html_emit` update the board rendering. The beauty of __Engine__ is in how it unifies these components: the state machine manages the HTML output and user interactions, while the backend logic processes the game mechanics, resulting in a cohesive and dynamic gaming experience.
+The __Qoraal Engine__ framework leverages this concept by mapping state transitions to HTML rendering, it turns what could be a tangle of code into a clear, hierarchical process. This not only keeps your code neat and scalable but also makes development easy, as every state tells a part of the application's story.
 
-On system startup, the Tic-Tac AI initializes with a model trained over 200,000 iterations. The initial model parameters were precomputed and stored to ensure immediate availability at launch.
+__Engine__ goes even further by integrating backend logic, as demonstrated in the tic-tac-toe example. Functions `tictac_play`, `tictac_status`, and `tictac_cell` connect with the AI game backend, handling moves, checking game status, while `html_ready`, `html_response` and `html_emit` update the board rendering. The beauty of __Engine__ is in how it unifies these components: the state machine manages the HTML output and user interactions, while the backend logic processes the game mechanics, resulting in a cohesive and dynamic experience.
 
-:bulb: Tip: You can retrain your AI using the console command `tictactrain x`, where `x` is the number of iterations you want to train it for.
 
-So dive in and experience how structured state machines can transform your approach to rendering, interactivity, and even game logic!
 
 ### Quick start
 The demo application can be compiled using the POSIX port for evaluation. 
@@ -207,4 +188,10 @@ To run it locally on Windows/Linux, follow these steps:
 4. If building locally you can access the web interface at http://127.0.0.1:8080 (or use your build machine’s IP if running remotely).
 
 That’s it. 🚀
+
+On system startup, the Tic-Tac AI initializes with a model trained over 200,000 iterations. The initial model parameters were precomputed and stored to ensure immediate availability at launch.
+
+:bulb: Tip: You can retrain your AI using the console command `tictactrain x`, where `x` is the number of iterations you want to train it for.
+
+So dive in and experience how structured state machines can transform your approach to rendering, interactivity, and even game logic!
 
