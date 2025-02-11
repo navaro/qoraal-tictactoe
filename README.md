@@ -173,21 +173,33 @@ __Engine__ goes even further by integrating backend logic, as demonstrated in th
 
 
 
-### Quick start
-The demo application can be compiled using the POSIX port for evaluation. 
-Currently supported RTOS options include ChibiOS, FreeRTOS, and ThreadX, if you have an IP stack like LwIP.
+## Quick Start  
 
-Since IP connectivity is required, you cannot run this in GitHub Codespaces.
-To run it locally on Windows/Linux, follow these steps:
+The demo application can be compiled using the **POSIX port**, allowing you to evaluate it directly on your PC!  
 
-1. Open your development environment and checkout the repository.
-2. Run the appropriate script based on your OS:
-    - **Windows**: `> build_and_run.bat`
-    - **Linux**: `$ sh ./build_and_run.sh`
-3. When the application starts, a shell will open, displaying startup logs.
-4. If building locally you can access the web interface at http://127.0.0.1:8080 (or use your build machine’s IP if running remotely).
+For embedded targets, currently supported **RTOS options** include **ChibiOS, FreeRTOS, and ThreadX**, provided you have an IP stack like **LwIP**.  
 
-That’s it. 🚀
+⚠️ **Note:** Since IP connectivity is required, you **cannot run this in GitHub Codespaces**.  
+
+### Running Locally on Windows/Linux  
+
+1. Open your development environment and **checkout the repository**.  
+2. Run the appropriate script based on your OS:  
+   - **Windows**:  
+     ```sh
+     > build_and_run.bat
+     ```  
+   - **Linux**:  
+     ```sh
+     $ sh ./build_and_run.sh
+     ```  
+3. When the application starts, a shell will open, displaying **startup logs**.  
+4. If building locally, you can access the web interface at:  
+   - **http://127.0.0.1:8080** (for local builds)  
+   - Use **your build machine’s IP** if running remotely.  
+
+That’s it—you're up and running! 🚀  
+
 
 On system startup, the Tic-Tac AI initializes with a model trained over 200,000 iterations. The initial model parameters were precomputed and stored to ensure immediate availability at launch.
 
