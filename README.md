@@ -165,13 +165,13 @@ statemachine tictactoe {
 
 ## Quick Start  
 
-The demo application can be compiled using the **POSIX port**, allowing you to evaluate it directly in a **GitHub Codespace** or on your PC! For embedded targets, the following RTOS options are supported: **ChibiOS, FreeRTOS, and ThreadX** (provided you have an IP stack like **LwIP**).  
+This demo application can be compiled using the **POSIX port**, allowing you to evaluate it directly in a **GitHub Codespace** or on your PC! For embedded targets, the following RTOS options are supported: **ChibiOS, FreeRTOS, and ThreadX** (provided you have an IP stack like **LwIP**).  
 
-⚠️ **Note:** If running in **GitHub Codespaces**, the application will use **port forwarding**. Once the server starts on port 8080, you'll get a browser link for accessing the web interface on that port.
+⚠️ **Note:** If running in **GitHub Codespaces**, the application will use **port forwarding**. Once the web server starts on port 8080, you'll get a browser link for accessing the web interface on that port.
 
 ### Running on Windows/Linux/Codespace  
 
-1. Open your development environment and **clone the repository**. If you open a **GitHub Codespace**, the repository is preloaded—just open a terminal (ctrl+`). 
+1. Open your development environment and clone the repository. If you use a **GitHub Codespace**, the repository is preloaded—just open a terminal (ctrl+`). 
 2. Run the appropriate script based on your OS:  
 
 ```sh
