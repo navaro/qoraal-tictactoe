@@ -139,8 +139,8 @@ statemachine tictactoe {
 
                     /*
                      * Increment register [r] after processing each cell.
-                     * Once [r] reaches 9, set accumulator [a] and return to "ready".
-                     * Otherwise, continue rendering the next cell.
+                     * Once [r] reaches 9, the accumulator [a] is set and the event transition to "ready".
+                     * Otherwise, the event transition back to "html_board_cell" rendering the next cell.
                      */
                     action (_state_start, r_inc, 9)
                     event_nt (_state_start, html_board_cell)
