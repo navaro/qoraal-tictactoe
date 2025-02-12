@@ -72,7 +72,7 @@ statemachine tictactoe {
     super html {
         state html_head {
             /*
-             * Engine state machine commands are single-line, 
+             * Engine Machine Language commands are single-line, 
              * but multi-line text blocks are supported. 
              * The closing bracket must be on the same line as the final text line.
              */
