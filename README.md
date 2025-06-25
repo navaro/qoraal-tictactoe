@@ -122,9 +122,16 @@ statemachine tictactoe {
 
             super html_board {
                 state html_board_cell {
+
+                    /*
+                     * Load the state of the cell [r] into the accumulator [a].
+                     */
                     action_ld (_state_start, [a], tictac_cell, [r])
 
                     /*
+                     * The action_eq compares the accumulator to the state each cell can be in. If equal, 
+                     * the given html is emmited.
+                     *
                      * If a cell is open, render it as a clickable link triggering a _tictac_tick event.
                      * The cell number is passed via the [e] event register.
                      */
