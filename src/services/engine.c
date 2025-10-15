@@ -36,6 +36,12 @@
 
 #define DBG_MESSAGE_ENGIE(severity, fmt_str, ...)   DBG_MESSAGE_T_REPORT (SVC_LOGGER_TYPE(severity,0), QORAAL_SERVICE_ENGINE, fmt_str, ##__VA_ARGS__)
 
+#if 1 // ENGINE_LINKED_DEFAULT
+extern const char                           _binary_tictactoe_e_end[] ;
+extern const char                           _binary_tictactoe_e_start[] ;
+#define DEFAULT_STATEMACHINE_END            _binary_tictactoe_e_end
+#define DEFAULT_STATEMACHINE_START          _binary_tictactoe_e_start
+#endif
 
 
 /*===========================================================================*/
@@ -123,50 +129,25 @@ int32_t
 engine_machine_start (const char *filename, void* ctx, STARTER_OUT_FP log_cb, bool start, bool verbose)
 {
     int32_t res ;
-    /*
-    * Read the Machine Definition File specified on the command line.
-    */
-    FILE *fp;
-    fp = fopen(filename, "rb");
-    if (fp == NULL) {
-        return E_NOTFOUND;
-    }
 
-    fseek(fp, 0L, SEEK_END);
-    long sz = ftell(fp);
-    fseek(fp, 0L, SEEK_SET);
-    char *buffer = qoraal_malloc(QORAAL_HeapAuxiliary, sz);
-    if (!buffer) {
-        fclose(fp);
-        return E_NOMEM;
-    }
-
-    long num = fread(buffer, 1, sz, fp);
-    if (!num) {
-        fclose(fp);
-        qoraal_free(QORAAL_HeapAuxiliary, buffer);
-        return E_FILE;
-    }
-
-    fclose(fp);
 
     /*
      * Lets get the engine started...
      */
     starter_stop();
     if (start) {
-        res = starter_start (buffer, sz, ctx, log_cb, verbose);
+        res = starter_start (DEFAULT_STATEMACHINE_START, DEFAULT_STATEMACHINE_END-DEFAULT_STATEMACHINE_START, 
+                        ctx, log_cb, verbose);
         if (res) {
             starter_stop ();
 
         }
 
     } else {
-        res = starter_compile (buffer, sz, ctx, log_cb, verbose) ;
+        res = starter_compile (DEFAULT_STATEMACHINE_START, DEFAULT_STATEMACHINE_END-DEFAULT_STATEMACHINE_START,  
+                        ctx, log_cb, verbose) ;
 
     }
-
-    qoraal_free (QORAAL_HeapAuxiliary, buffer);
 
     return res;
 }
