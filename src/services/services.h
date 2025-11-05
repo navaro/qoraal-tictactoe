@@ -40,7 +40,8 @@
 typedef enum  {
     QORAAL_SERVICE_SHELL = SVC_SERVICES_USER,
     QORAAL_SERVICE_WWW,
-    QORAAL_SERVICE_ENGINE
+    QORAAL_SERVICE_ENGINE,
+    QORAAL_SERVICE_TELNET
 } QORAAL_SERVICES ;
 
 /*===========================================================================*/
@@ -62,6 +63,10 @@ extern "C" {
 
     extern int32_t      engine_machine_start (const char *filename, void* ctx, STARTER_OUT_FP log_cb, bool start, bool verbose) ;
     extern void         engine_machine_stop (void) ;
+
+    extern int32_t      telnetserver_service_ctrl (uint32_t code, uintptr_t arg) ;
+    extern int32_t      telnetserver_service_run (uintptr_t arg) ;
+
 
 #ifdef __cplusplus
 }
