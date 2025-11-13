@@ -412,7 +412,6 @@ static int board_full(int board[9]) {
  * @return The chosen move index, or -1 if no legal moves exist.
  */
 static int choose_move_epsilon(int board[9], double epsilon) {
-    NeuralNet *net = &_tictactoe_net;
     int legal_moves[9], count = 0;
     for (int i = 0; i < 9; i++) {
         if (board[i] == 0)

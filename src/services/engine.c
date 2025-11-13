@@ -51,19 +51,11 @@ extern const char                           _binary_tictactoe_e_start[] ;
 
 static int32_t  qshell_cmd_run (SVC_SHELL_IF_T * pif, char** argv, int argc) ;
 static int32_t  qshell_cmd_compile (SVC_SHELL_IF_T * pif, char** argv, int argc) ;
-static int32_t  qshell_cmd_list (SVC_SHELL_IF_T * pif, char** argv, int argc) ;
-
-
-static int32_t qshell_cmd_event (SVC_SHELL_IF_T * pif, char** argv, int argc) ;
-static int32_t qshell_cmd_trans (SVC_SHELL_IF_T * pif, char** argv, int argc) ;
-static int32_t qshell_cmd_engine_dbg (SVC_SHELL_IF_T * pif, char** argv, int argc) ;
-static int32_t qshell_cmd_engine (SVC_SHELL_IF_T * pif, char** argv, int argc) ;
 
 
 SVC_SHELL_CMD_LIST_START(engine, QORAAL_SERVICE_ENGINE)
 SVC_SHELL_CMD_LIST("run", qshell_cmd_run, "<filename>")
 SVC_SHELL_CMD_LIST("compile", qshell_cmd_compile, "<filename> [verbose]")
-
 
 
 SVC_SHELL_CMD_LIST_END()
