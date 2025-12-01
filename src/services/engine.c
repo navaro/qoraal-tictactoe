@@ -157,8 +157,7 @@ engine_machine_start (const char *filename, void* ctx, STARTER_OUT_FP log_cb, bo
 
     }
 
-    engine_log_mem_usage(); 
-    
+
 #if defined CFG_OS_POSIX
     qoraal_free(QORAAL_HeapAuxiliary, buffer) ;
 #endif
