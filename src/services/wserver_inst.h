@@ -22,25 +22,65 @@
  */
 
 
-#ifndef __WNLOG_H__
-#define __WNLOG_H__
+/**
+ * @file        wserver.h
+ * @author      Natie van Rooyen <natie@navaro.nl>
+ * @date        January 1, 2015
+ * @version     0.0.0.1 (alpha)
+ *
+ * @section DESCRIPTION
+ *
+ * Simple web server for provisioning.
+ */
+
+#ifndef __WSERVER_INST_H__
+#define __WSERVER_INST_H__
 
 
 #include <stdint.h>
-#include "qoraal-http/httpserver.h"
 
 
 /*===========================================================================*/
 /* Client constants.                                                         */
 /*===========================================================================*/
 
+/**
+ * @name    Error Codes
+ * @{
+ */
+
+/**
+ * @name    Debug Level
+ * @{
+ */
+
+ /** @} */
+
+/** @} */
+
 /*===========================================================================*/
 /* Client pre-compile time settings.                                         */
 /*===========================================================================*/
 
+/**
+ * @name    HTML text
+ * @{
+ */
+#define WSERVER_TITLE_TEXT      "Qoraal"
+
+/** @} */
+
+
+
+/** @} */
+
+
+
+
 /*===========================================================================*/
 /* Client data structures and types.                                         */
 /*===========================================================================*/
+
 
 /*===========================================================================*/
 /* External declarations.                                                    */
@@ -50,14 +90,12 @@
 extern "C" {
 #endif
 
-int32_t		wnlog_handler (HTTP_USER_T *user, uint32_t method, char* endpoint) ;
-int32_t     wnlog_memlog_handler (HTTP_USER_T *user, uint32_t method, char* endpoint) ;
-const char*	wnlog_ctrl (HTTP_USER_T *user, uint32_t method, char* endpoint, uint32_t type) ;
-
+    extern int32_t          wserver_service_ctrl (uint32_t code, uintptr_t arg) ;
+    extern int32_t          wserver_service_run (uintptr_t arg) ;
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __WNLOG_H__ */
+#endif /* __WSERVER_INST_H__ */
 

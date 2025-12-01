@@ -23,11 +23,14 @@
 
 
 
-#ifndef __WIMAGE_H__
-#define __WIMAGE_H__
+#ifndef __HTML_H__
+#define __HTML_H__
+
 
 #include <stdint.h>
-#include "qoraal-http/httpserver.h"
+#include <stdbool.h>
+#include "qoraal/qoraal.h"
+#include "qoraal-http/wserver.h"
 
 /*===========================================================================*/
 /* Client constants.                                                         */
@@ -41,6 +44,15 @@
 /* Client data structures and types.                                         */
 /*===========================================================================*/
 
+typedef void (*HTML_EMIT_CB)(void* /*ctx*/, const char* /*html*/, uint32_t /*len*/) ;
+
+typedef struct HTML_EMIT_S {
+    HTTP_USER_T *           user ;
+    int32_t                 response ;
+    p_sem_t                 lock ;
+    p_event_t               complete ;
+} HTML_EMIT_T ;
+
 /*===========================================================================*/
 /* External declarations.                                                    */
 /*===========================================================================*/
@@ -49,10 +61,16 @@
 extern "C" {
 #endif
 
+    int32_t     html_emit_create (HTML_EMIT_T* emit) ;
+    void        html_emit_delete (HTML_EMIT_T* emit) ;
+    int32_t     html_emit_lock (HTML_EMIT_T* emit, uint32_t timeout) ;
+    void        html_emit_unlock (HTML_EMIT_T* emit) ;
 
-    extern int32_t          wimage_handler(HTTP_USER_T *user, uint32_t method, char* endpoint) ;
+    int32_t     html_emit_wait (const char * ep, uint16_t event, uint16_t parm, HTTP_USER_T * user, uint32_t timeout) ;
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* __WIMAGE_H__ */
+
+#endif /* __WRTLOG_H__ */
+

@@ -22,11 +22,13 @@
 #include <stdio.h>
 #include <string.h>
 #include "qoraal/qoraal.h"
+#include "qoraal/qfs_port.h"
 #include "qoraal/svc/svc_services.h"
 #include "qoraal/svc/svc_shell.h"
 #include "qoraal-engine/engine.h"
 #include "qoraal-engine/starter.h"
 #include "services.h"
+
 
 
 /*===========================================================================*/
@@ -36,6 +38,12 @@
 
 #define DBG_MESSAGE_ENGIE(severity, fmt_str, ...)   DBG_MESSAGE_T_REPORT (SVC_LOGGER_TYPE(severity,0), QORAAL_SERVICE_ENGINE, fmt_str, ##__VA_ARGS__)
 
+#if !defined CFG_OS_POSIX
+extern const char                           _binary_tictactoe_e_end[] ;
+extern const char                           _binary_tictactoe_e_start[] ;
+#define DEFAULT_STATEMACHINE_END            _binary_tictactoe_e_end
+#define DEFAULT_STATEMACHINE_START          _binary_tictactoe_e_start
+#endif
 
 
 /*===========================================================================*/
@@ -44,19 +52,11 @@
 
 static int32_t  qshell_cmd_run (SVC_SHELL_IF_T * pif, char** argv, int argc) ;
 static int32_t  qshell_cmd_compile (SVC_SHELL_IF_T * pif, char** argv, int argc) ;
-static int32_t  qshell_cmd_list (SVC_SHELL_IF_T * pif, char** argv, int argc) ;
-
-
-static int32_t qshell_cmd_event (SVC_SHELL_IF_T * pif, char** argv, int argc) ;
-static int32_t qshell_cmd_trans (SVC_SHELL_IF_T * pif, char** argv, int argc) ;
-static int32_t qshell_cmd_engine_dbg (SVC_SHELL_IF_T * pif, char** argv, int argc) ;
-static int32_t qshell_cmd_engine (SVC_SHELL_IF_T * pif, char** argv, int argc) ;
 
 
 SVC_SHELL_CMD_LIST_START(engine, QORAAL_SERVICE_ENGINE)
 SVC_SHELL_CMD_LIST("run", qshell_cmd_run, "<filename>")
 SVC_SHELL_CMD_LIST("compile", qshell_cmd_compile, "<filename> [verbose]")
-
 
 
 SVC_SHELL_CMD_LIST_END()
@@ -123,50 +123,44 @@ int32_t
 engine_machine_start (const char *filename, void* ctx, STARTER_OUT_FP log_cb, bool start, bool verbose)
 {
     int32_t res ;
-    /*
-    * Read the Machine Definition File specified on the command line.
-    */
-    FILE *fp;
-    fp = fopen(filename, "rb");
-    if (fp == NULL) {
-        return E_NOTFOUND;
+    char * buffer = NULL ;
+    uint32_t length = 0 ;
+
+#if defined CFG_OS_POSIX
+    length = qfs_read_all ("tictactoe.e", &buffer);
+    if (length <= 0) {
+        DBG_MESSAGE_ENGIE (DBG_MESSAGE_SEVERITY_ERROR, "ENG   :E: error reading default state machine") ;
+        return EOK ;
     }
 
-    fseek(fp, 0L, SEEK_END);
-    long sz = ftell(fp);
-    fseek(fp, 0L, SEEK_SET);
-    char *buffer = qoraal_malloc(QORAAL_HeapAuxiliary, sz);
-    if (!buffer) {
-        fclose(fp);
-        return E_NOMEM;
-    }
-
-    long num = fread(buffer, 1, sz, fp);
-    if (!num) {
-        fclose(fp);
-        qoraal_free(QORAAL_HeapAuxiliary, buffer);
-        return E_FILE;
-    }
-
-    fclose(fp);
+#else
+    // Use linked in default machine
+    buffer = (char *) DEFAULT_STATEMACHINE_START ;
+    length = (uint32_t)(DEFAULT_STATEMACHINE_END - DEFAULT_STATEMACHINE_START
+#endif
 
     /*
      * Lets get the engine started...
      */
     starter_stop();
     if (start) {
-        res = starter_start (buffer, sz, ctx, log_cb, verbose);
+        res = starter_start (buffer, length, 
+                        ctx, log_cb, verbose);
         if (res) {
             starter_stop ();
 
         }
 
     } else {
-        res = starter_compile (buffer, sz, ctx, log_cb, verbose) ;
+        res = starter_compile (buffer, length,  
+                        ctx, log_cb, verbose) ;
 
     }
 
-    qoraal_free (QORAAL_HeapAuxiliary, buffer);
+
+#if defined CFG_OS_POSIX
+    qoraal_free(QORAAL_HeapAuxiliary, buffer) ;
+#endif
 
     return res;
 }

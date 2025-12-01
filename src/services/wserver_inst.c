@@ -29,17 +29,18 @@
 #include <string.h>
 #include "qoraal/qoraal.h"
 #include "qoraal/svc/svc_services.h"
-#include "html/wsystem.h"
-#include "html/wservices.h"
-#include "html/wabout.h"
-#include "html/wshell.h"
-#include "html/wnlog.h"
-#include "html/wrtlog.h"
+#include "qoraal-http/wserver.h"
+#include "qoraal-http/example/wsystem.h"
+#include "qoraal-http/example/wservices.h"
+#include "qoraal-http/example/wabout.h"
+#include "qoraal-http/example/wshell.h"
+#include "qoraal-http/example/wnlog.h"
+#include "qoraal-http/example/wrtlog.h"
+#include "qoraal-http/example/wwebapi.h"
+#include "qoraal-http/example/wcss.h"
+#include "qoraal-http/example/wimage.h"
 #include "html/wengine.h"
-#include "css/wcss.h"
-#include "image/wimage.h"
 #include "wserver_inst.h"
-
 
 static int32_t      wserver_init (uintptr_t arg) ;
 static int32_t      wserver_start (uintptr_t port) ;
@@ -297,7 +298,17 @@ wserver_authenticate (const char * user, const char * passwd)
 int32_t
 wserver_start (uintptr_t arg)
 {
-    uint32_t port = 8080 ; //registry_get ("www.port", 80) ;
+#if defined CFG_OS_POSIX
+    uint32_t port = 8000 ; 
+#else
+    uint32_t port = 0 ;
+#endif
+#if defined CFG_HTTPSERVER_TLS_DISABLE
+    port += 80 ;
+#else
+    port += 443;
+#endif
+
     bool ssl = false ; // registry_get ("www.ssl", false) ;
 
     static const WSERVER_FRAMEWORK wserver_std_headers[] = {
