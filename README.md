@@ -24,7 +24,7 @@
 
 #### Check this out first—then hit me.
 
-
+> A demo using the Qoraal Engine to generate HTML via hierarchical state machines, showcasing structured rendering + AI-driven game logic.
 
 <div align="left">
 
@@ -161,7 +161,7 @@ statemachine tictactoe {
 
 ## Quick Start  
 
-This demo application can be compiled using the **POSIX port**, allowing you to evaluate it directly in a **GitHub Codespace** or on your PC! For embedded targets, the following RTOS options are supported: **ChibiOS, FreeRTOS, and ThreadX** (provided you have an IP stack like **LwIP**).  
+This demo application can be compiled using the **POSIX port**, allowing you to evaluate it directly in a **GitHub Codespace** or on your PC! For embedded targets, the following RTOS options are supported: **Zephyr, ChibiOS, FreeRTOS, and ThreadX** (provided you have an IP stack like **LwIP** or **NetX**).  
 
 ⚠️ **Note:** If running in **GitHub Codespaces**, the application will use **port forwarding**. Once the web server starts on port 8080, you'll get a browser link for accessing the web interface on that port.
 
@@ -195,13 +195,13 @@ So dive in and experience how structured state machines can transform your appro
 
 
 ## Lets get into it
-At its core, a hierarchical state machine can be powerful tool for structuring logic in a modular, maintainable way. When you use it to render structured text like HTML, you unlock flexible method for building dynamic web applications.
+At its core, a hierarchical state machine is a powerful way to structure logic in a modular, maintainable way. When you use it to render structured text like HTML, you get a flexible method for building dynamic web applications.
 
-The **Qoraal Engine** and **Qoraal HTTP** framework leverages this concept by mapping state transitions to HTML rendering, it turns what could be a tangle of code into a clear, hierarchical process. This not only keeps your code neat and scalable but also makes development easy, as every state tells a part of the application's story.
+The **Qoraal Engine** and **Qoraal HTTP** framework map state transitions directly to HTML rendering, turning what could be a tangle of code into a clear, hierarchical flow. Each state adds a piece of the page, keeping everything neat, scalable, and easy to reason about.
 
-**Qoraal Engine** goes even further by integrating backend logic, as demonstrated in the tic-tac-toe example. Functions `tictac_play`, `tictac_status`, and `tictac_cell` connect with the AI game backend, handling moves, checking game status, while `html_ready`, `html_response` and `html_emit` update the board rendering. The beauty of **Qoraal Engine** together with **Qoraal HTTP** is in how it unifies these components: the state machine manages the HTML output and user interactions, while the backend logic processes the game mechanics, resulting in a cohesive and dynamic experience.
+In this Tic-Tac-Toe demo, backend logic and rendering stay tightly connected. Functions like `tictac_play`, `tictac_status`, and `tictac_cell` handle moves and game checks, while `html_ready`, `html_response`, and `html_emit` control the board output. Together, they form a unified system where the engine manages the interaction flow, and the logic drives the game.
 
-With this approach, your web applications gain a structured backbone that’s easy to extend and maintain. Whether you're building interactive dashboards, dynamic content systems, or even AI-driven interfaces like this Tic-Tac-Toe game, **Qoraal Engine** streamlines the complexity into a modular, declarative flow. Now, it’s time to see it in action.
+With this approach, your web applications get a structured backbone that's easy to extend. Whether you’re building dashboards, dynamic content, or even AI-driven interfaces like this game, **Qoraal Engine** turns complexity into a clean, declarative model.
 
 
 
