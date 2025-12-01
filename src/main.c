@@ -2,10 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include "qoraal/qoraal.h"
+#include "qoraal-http/qoraal.h"
 #include "qoraal/svc/svc_services.h"
-#include "services/www/wserver_inst.h"
-#include "qoraal/example/platform.h"
-#include "qoraal/example/console.h"
+#include "services/wserver_inst.h"
+#include "qoraal/platform.h"
+#include "qoraal/qshell/console.h"
 #include "services/services.h"
 
 /*===========================================================================*/
@@ -23,7 +24,9 @@ SVC_SERVICE_LIST_START(_qoraal_services_list)
 SVC_SERVICE_RUN_DECL("shell",  console_service_run, console_service_ctrl, 0, 6000, OS_THREAD_PRIO_8, QORAAL_SERVICE_SHELL, SVC_SERVICE_FLAGS_AUTOSTART)
 SVC_SERVICE_DECL("engine", engine_service_ctrl, 0, QORAAL_SERVICE_ENGINE, SVC_SERVICE_FLAGS_AUTOSTART)
 SVC_SERVICE_RUN_DECL("www",  wserver_service_run, wserver_service_ctrl, 0, 6000, OS_THREAD_PRIO_4, QORAAL_SERVICE_WWW, SVC_SERVICE_FLAGS_AUTOSTART)
+#if !defined CFG_OS_POSIX
 SVC_SERVICE_RUN_DECL("telnet",  telnetserver_service_run, telnetserver_service_ctrl, 0, 6000, OS_THREAD_PRIO_5, QORAAL_SERVICE_TELNET, SVC_SERVICE_FLAGS_AUTOSTART)
+#endif
 SVC_SERVICE_LIST_END()
 
 static const QORAAL_CFG_T           _qoraal_cfg = {

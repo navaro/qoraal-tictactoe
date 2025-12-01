@@ -1,19 +1,12 @@
 # Collect all test source files
 set(TEST_SRCS
     main.c
+    platform.c
     tictactoe.c
     services/engine.c
-    services/www/wserver_inst.c
-    services/www/html/wabout.c
-    services/www/html/wengine.c
-    services/www/html/wnlog.c
-    services/www/html/wrtlog.c
-    services/www/html/wservices.c
-    services/www/html/wshell.c
-    services/www/html/wsystem.c
-    services/www/image/wimage.c
-    services/www/css/wcss.c
-    services/www/parts/html.c
+    services/wserver_inst.c
+    services/html/htmlpart.c
+    services/html/wengine.c
 )
 
 # Add the executable target
@@ -32,7 +25,6 @@ target_compile_options(qoraal-engine PRIVATE -O0 -g)
 
 # Define CFG_OS_MEM_DEBUG_ENABLE for qoraal
 target_compile_definitions(qoraal PUBLIC CFG_OS_POSIX)
-target_compile_definitions(qoraal PRIVATE CFG_PLATFORM_ENABLE_WS2)
 target_compile_definitions(qoraal-engine PRIVATE CFG_ENGINE_REGISTRY_DISABLE)
 
 

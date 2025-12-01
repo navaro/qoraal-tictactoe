@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "qoraal/qoraal.h"
+#include "qoraal/qfs_port.h"
 #include "qoraal/svc/svc_services.h"
 #include "qoraal/svc/svc_shell.h"
 #include "qoraal-engine/engine.h"
@@ -37,7 +38,7 @@
 
 #define DBG_MESSAGE_ENGIE(severity, fmt_str, ...)   DBG_MESSAGE_T_REPORT (SVC_LOGGER_TYPE(severity,0), QORAAL_SERVICE_ENGINE, fmt_str, ##__VA_ARGS__)
 
-#if 1 // ENGINE_LINKED_DEFAULT
+#if !defined CFG_OS_POSIX
 extern const char                           _binary_tictactoe_e_end[] ;
 extern const char                           _binary_tictactoe_e_start[] ;
 #define DEFAULT_STATEMACHINE_END            _binary_tictactoe_e_end
@@ -122,14 +123,28 @@ int32_t
 engine_machine_start (const char *filename, void* ctx, STARTER_OUT_FP log_cb, bool start, bool verbose)
 {
     int32_t res ;
+    char * buffer = NULL ;
+    uint32_t length = 0 ;
 
+#if defined CFG_OS_POSIX
+    length = qfs_read_all ("tictactoe.e", &buffer);
+    if (length <= 0) {
+        DBG_MESSAGE_ENGIE (DBG_MESSAGE_SEVERITY_ERROR, "ENG   :E: error reading default state machine") ;
+        return EOK ;
+    }
+
+#else
+    // Use linked in default machine
+    buffer = (char *) DEFAULT_STATEMACHINE_START ;
+    length = (uint32_t)(DEFAULT_STATEMACHINE_END - DEFAULT_STATEMACHINE_START
+#endif
 
     /*
      * Lets get the engine started...
      */
     starter_stop();
     if (start) {
-        res = starter_start (DEFAULT_STATEMACHINE_START, DEFAULT_STATEMACHINE_END-DEFAULT_STATEMACHINE_START, 
+        res = starter_start (buffer, length, 
                         ctx, log_cb, verbose);
         if (res) {
             starter_stop ();
@@ -137,10 +152,16 @@ engine_machine_start (const char *filename, void* ctx, STARTER_OUT_FP log_cb, bo
         }
 
     } else {
-        res = starter_compile (DEFAULT_STATEMACHINE_START, DEFAULT_STATEMACHINE_END-DEFAULT_STATEMACHINE_START,  
+        res = starter_compile (buffer, length,  
                         ctx, log_cb, verbose) ;
 
     }
+
+    engine_log_mem_usage(); 
+    
+#if defined CFG_OS_POSIX
+    qoraal_free(QORAAL_HeapAuxiliary, buffer) ;
+#endif
 
     return res;
 }
