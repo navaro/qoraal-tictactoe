@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "qoraal/qoraal.h"
-#include "qoraal/qfs_port.h"
+#include "qoraal/qfs.h"
 #include "qoraal/svc/svc_services.h"
 #include "qoraal/svc/svc_shell.h"
 #include "qoraal-engine/engine.h"

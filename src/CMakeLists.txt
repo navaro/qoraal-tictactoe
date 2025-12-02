@@ -28,7 +28,6 @@ target_compile_definitions(qoraal PUBLIC CFG_OS_POSIX)
 target_compile_definitions(qoraal-engine PRIVATE CFG_ENGINE_REGISTRY_DISABLE)
 
 
-
 target_link_options(tictactoe PRIVATE
     "-Wl,--whole-archive"
     "$<TARGET_FILE:qoraal-engine>"
