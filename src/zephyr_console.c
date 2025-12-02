@@ -10,10 +10,10 @@
 /* ===== Config ===== */
 #define RX_RB_SZ   64
 #define TX_RB_SZ   512
-#define TX_CHUNK   64
+#define TX_CHUNK   16
 
 /* ===== State ===== */
-static const struct device *zephyr_console_uart;
+static const struct device *zephyr_console_uart = 0;
 
 /* RX */
 static struct ring_buf rx_rb;
@@ -36,7 +36,7 @@ static void usart_isr(const struct device *dev, void *user)
 
     /* RX: drain FIFO -> ring, wake reader */
     while (uart_irq_update(dev) && uart_irq_rx_ready(dev)) {
-        uint8_t tmp[64];
+        uint8_t tmp[32];
         int n = uart_fifo_read(dev, tmp, sizeof(tmp));
         if (n <= 0) break;
         (void)ring_buf_put(&rx_rb, tmp, (uint32_t)n);
@@ -102,21 +102,31 @@ int32_t console_get_char(uint32_t timeout_ms)
 {
     uint8_t c;
 
+	if (!zephyr_console_uart) {
+		return EOF ;
+
+	}
+
     if (ring_buf_get(&rx_rb, &c, 1) == 1) {
         return (int32_t)c;
     }
 
     if (k_sem_take(&rx_sem, K_MSEC(timeout_ms)) != 0) {
-        return -1; /* timeout */
+        return 0; /* timeout */
     }
 
-    return (ring_buf_get(&rx_rb, &c, 1) == 1) ? (int32_t)c : -1;
+    return (ring_buf_get(&rx_rb, &c, 1) == 1) ? (int32_t)c : 0;
 }
 
 /* ===== TX: serialize writers + enqueue + ISR drains ===== */
 size_t console_write(const uint8_t *data, size_t len, uint32_t timeout_ms)
 {
     size_t written = 0;
+
+	if (!zephyr_console_uart) {
+		return written ;
+
+	}
 
     /* binary semaphore as a mutex (no PI needed; HW-bound) */
     if (k_sem_take(&tx_lock, K_MSEC(timeout_ms)) != 0) {
@@ -154,15 +164,6 @@ size_t console_write(const uint8_t *data, size_t len, uint32_t timeout_ms)
 #include <stdarg.h>
 
 struct shell; /* fwd-declare */
-
-static void vwrite_fmt(const char *fmt, va_list ap)
-{
-    char buf[256];
-    int n = vsnprintk(buf, sizeof(buf), fmt, ap);
-    if (n < 0) return;
-    if ((size_t)n > sizeof(buf)) n = sizeof(buf);
-    (void)console_write((const uint8_t *)buf, (size_t)n, 500);
-}
 
 static inline void write_str(const char *s)
 {

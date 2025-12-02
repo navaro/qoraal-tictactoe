@@ -219,7 +219,7 @@ platform_flash_read (uint32_t addr, uint32_t len, uint8_t * data)
 //#include <zephyr/random/rand32.h>
 #include <zephyr/sys/printk.h>
 
-#include "platform.h"
+#include "qoraal/platform.h"
 #include <stdlib.h>
 
 extern size_t console_write(const uint8_t *data, size_t len, uint32_t timeout_ms) ;
@@ -271,7 +271,9 @@ platform_print(const char *format)
 int32_t 
 platform_getch (uint32_t timeout_ms)
 {
-    return console_get_char(timeout_ms);
+    int ch = console_get_char(timeout_ms);
+    if (ch > 0) console_write (&ch, 1, 30) ;
+    return ch;
 }
 
 void
