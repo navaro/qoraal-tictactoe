@@ -39,9 +39,9 @@ include_directories("${qoraal_http_SOURCE_DIR}/include")
 add_subdirectory(src)
 
 # Option to build tests
-option(BUILD_HTTPTEST "Build the test directory" OFF)
+option(BUILD_TESTS "Build the test directory" OFF)
 
-if(BUILD_HTTPTEST)
+if(BUILD_TESTS)
     add_subdirectory(test)
 endif()
 
