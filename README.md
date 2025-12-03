@@ -172,7 +172,7 @@ This demo application can be compiled using the **POSIX port**, allowing you to 
 
 ```sh
 # For Linux or Codespace:
-$ sh ./build_and_run.sh  
+$ make all  
 
 # For Windows:
 > build_and_run.bat  
