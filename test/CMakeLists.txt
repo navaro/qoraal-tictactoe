@@ -34,6 +34,7 @@ endif()
 target_link_options(tictactoe PRIVATE
     "-Wl,--whole-archive"
     "$<TARGET_FILE:qoraal-engine>"
+    "$<TARGET_FILE:qoraal-tictactoe>"
     "-Wl,--no-whole-archive"
 )
 
