@@ -22,7 +22,7 @@
 <br>
 <div align="center">
 
-#### Check this out first—then hit me.
+#### Check this out first, then hit me.
 
 > A demo using the Qoraal Engine to generate HTML via hierarchical state machines, showcasing structured rendering + AI-driven game logic.
 
@@ -167,7 +167,7 @@ This demo application can be compiled using the **POSIX port**, allowing you to 
 
 ### Running on Windows/Linux/Codespace  
 
-1. Open your development environment and clone the repository. If you use a **GitHub Codespace**, the repository is preloaded—just open a terminal (ctrl+`). 
+1. Open your development environment and clone the repository. If you use a **GitHub Codespace**, the repository is preloaded, just open a terminal (ctrl+`). 
 2. Run the appropriate script based on your OS:  
 
 ```sh
