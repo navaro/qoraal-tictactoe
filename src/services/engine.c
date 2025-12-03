@@ -136,7 +136,7 @@ engine_machine_start (const char *filename, void* ctx, STARTER_OUT_FP log_cb, bo
 #else
     // Use linked in default machine
     buffer = (char *) DEFAULT_STATEMACHINE_START ;
-    length = (uint32_t)(DEFAULT_STATEMACHINE_END - DEFAULT_STATEMACHINE_START
+    length = (uint32_t)(DEFAULT_STATEMACHINE_END - DEFAULT_STATEMACHINE_START) ;
 #endif
 
     /*
