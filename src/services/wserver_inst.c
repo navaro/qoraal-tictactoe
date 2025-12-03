@@ -39,8 +39,9 @@
 #include "qoraal-http/example/wwebapi.h"
 #include "qoraal-http/example/wcss.h"
 #include "qoraal-http/example/wimage.h"
+#include "qoraal-tictactoe/wserver_inst.h"
 #include "html/wengine.h"
-#include "wserver_inst.h"
+
 
 static int32_t      wserver_init (uintptr_t arg) ;
 static int32_t      wserver_start (uintptr_t port) ;

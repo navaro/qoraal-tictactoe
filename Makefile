@@ -1,13 +1,6 @@
-# Detect OS and set platform-specific variables
-ifeq ($(OS),Windows_NT)
-    MKDIR = if not exist build mkdir build
-    EXECUTABLE = build\src\tictactoe.exe
-    RM = rmdir /S /Q
-else
-    MKDIR = mkdir -p build
-    EXECUTABLE = ./build/src/tictactoe
-    RM = rm -rf
-endif
+MKDIR = mkdir -p build
+EXECUTABLE = ./build/src/tictactoe
+RM = rm -rf
 
 .PHONY: all build run clean
 
@@ -15,7 +8,7 @@ all: build run
 
 build:
 	$(MKDIR)
-	cd build && cmake .. && cmake --build .
+	cd build && cmake .. -DBUILD_HTTPTEST=ON && cmake --build .
 
 run:
 	cd $(CURDIR) && $(EXECUTABLE)

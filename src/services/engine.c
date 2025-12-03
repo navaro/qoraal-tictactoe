@@ -27,7 +27,7 @@
 #include "qoraal/svc/svc_shell.h"
 #include "qoraal-engine/engine.h"
 #include "qoraal-engine/starter.h"
-#include "services.h"
+#include "qoraal-tictactoe/services.h"
 
 
 

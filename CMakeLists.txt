@@ -13,7 +13,7 @@ FetchContent_Declare(
     SOURCE_SUBDIR  .
 )
 
-set(CFG_ENGINE_REGISTRY_DISABLE ON CACHE BOOL "Disable engine registry")
+
 FetchContent_Declare(
     qoraal_engine
     GIT_REPOSITORY https://github.com/navaro/qoraal-engine.git
@@ -38,7 +38,13 @@ include_directories("${qoraal_http_SOURCE_DIR}/include")
 # Add subdirectories
 add_subdirectory(src)
 
-# Set compile-time definitions for the qoraal OS
+# Option to build tests
+option(BUILD_HTTPTEST "Build the test directory" OFF)
+
+if(BUILD_HTTPTEST)
+    add_subdirectory(test)
+endif()
+
 
 
 
