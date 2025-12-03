@@ -181,10 +181,10 @@ $ make all
 3. When the application starts, a shell will open in the terminal, displaying **startup logs**. Look for `WSERV : : web server running on port 8080 without SSL!!`. 
 4. Now you can access the web interface:
    - In a codespace, click on the link for the forwarded port. This should show in the `PORTS` tab of your terminal.
-   - On your local PC, use **http://127.0.0.1:8080** (or your build machine’s local IP if running remotely).
+   - On your local PC, use **http://127.0.0.1:8080** (or your build machine's local IP if running remotely).
 
 
-That’s it—you're up and running! 🚀  Need more options? Check out [Qoraal Http](https://github.com/navaro/qoraal-http) and [Qoraal Engine](https://github.com/navaro/qoraal-engine).
+That's it, you're up and running! 🚀  Need more options? Check out [Qoraal Http](https://github.com/navaro/qoraal-http) and [Qoraal Engine](https://github.com/navaro/qoraal-engine).
 
 
 On system startup, the Tic-Tac AI initializes with a model trained over 200,000 iterations. The initial model parameters were precomputed and stored to ensure immediate availability at launch.
@@ -201,7 +201,7 @@ The **Qoraal Engine** and **Qoraal HTTP** framework map state transitions direct
 
 In this Tic-Tac-Toe demo, backend logic and rendering stay tightly connected. Functions like `tictac_play`, `tictac_status`, and `tictac_cell` handle moves and game checks, while `html_ready`, `html_response`, and `html_emit` control the board output. Together, they form a unified system where the engine manages the interaction flow, and the logic drives the game.
 
-With this approach, your web applications get a structured backbone that's easy to extend. Whether you’re building dashboards, dynamic content, or even AI-driven interfaces like this game, **Qoraal Engine** turns complexity into a clean, declarative model.
+With this approach, your web applications get a structured backbone that's easy to extend. Whether you're building dashboards, dynamic content, or even AI-driven interfaces like this game, **Qoraal Engine** turns complexity into a clean, declarative model.
 
 
 
