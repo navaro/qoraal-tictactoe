@@ -171,11 +171,8 @@ This demo application can be compiled using the **POSIX port**, allowing you to 
 2. Run the appropriate script based on your OS:  
 
 ```sh
-# For Linux or Codespace:
-$ make all  
-
-# For Windows:
-> build_and_run.bat  
+# For Linux, Windows or Codespace:
+$ make all   
 ```
 
 3. When the application starts, a shell will open in the terminal, displaying **startup logs**. Look for `WSERV : : web server running on port 8080 without SSL!!`. 
