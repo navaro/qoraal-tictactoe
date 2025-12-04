@@ -9,7 +9,6 @@ set(FLASH_SRC
 
 )
 
-
 # Add the library target
 add_library(qoraal-tictactoe STATIC ${FLASH_SRC})
 

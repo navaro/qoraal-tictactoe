@@ -31,9 +31,6 @@ FetchContent_MakeAvailable(qoraal qoraal_engine qoraal_http)
 
 # Include directories
 include_directories(include)
-include_directories("${qoraal_SOURCE_DIR}/include")
-include_directories("${qoraal_engine_SOURCE_DIR}/include")
-include_directories("${qoraal_http_SOURCE_DIR}/include")
 
 # Add subdirectories
 add_subdirectory(src)

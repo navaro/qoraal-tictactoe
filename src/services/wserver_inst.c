@@ -304,7 +304,7 @@ wserver_start (uintptr_t arg)
 #else
     uint32_t port = 0 ;
 #endif
-#if defined CFG_HTTPSERVER_TLS_DISABLE
+#if defined CFG_HTTPSERVER_TLS_DISABLE && CFG_HTTPSERVER_TLS_DISABLE
     port += 80 ;
 #else
     port += 443;

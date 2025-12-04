@@ -24,10 +24,9 @@ else()
     target_link_libraries(tictactoe qoraal qoraal-http qoraal-engine qoraal-tictactoe pthread m)
 endif()
 
-
-
-# Define CFG_OS_MEM_DEBUG_ENABLE for qoraal
-
+target_compile_definitions(qoraal-http PUBLIC CFG_HTTPSERVER_TLS_DISABLE=1)
+target_compile_definitions(qoraal-http PUBLIC CFG_HTTPCLIENT_TLS_DISABLE=1)
+target_compile_definitions(qoraal-http PUBLIC CFG_LITTLEFS_DISABLE=1)
 
 
 
