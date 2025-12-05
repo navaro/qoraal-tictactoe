@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(QoraalEngine LANGUAGES C)
+project(qoraal-tic-tac-toe LANGUAGES C)
 
 # --------------------
 # 1) Fetch the Qoraal repo

@@ -10,7 +10,7 @@ set(FLASH_SRC
 )
 
 # Add the library target
-add_library(qoraal-tictactoe STATIC ${FLASH_SRC})
+add_library(qoraal-tictactoe OBJECT ${FLASH_SRC})
 
 # Link necessary libraries
 target_link_libraries(qoraal-tictactoe qoraal-http qoraal-engine)
