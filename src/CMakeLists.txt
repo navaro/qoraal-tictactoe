@@ -15,3 +15,5 @@ add_library(qoraal-tictactoe STATIC ${FLASH_SRC})
 # Link necessary libraries
 target_link_libraries(qoraal-tictactoe qoraal-http qoraal-engine)
 
+# Set target include dirs
+target_include_directories(qoraal-http PUBLIC ${PROJECT_SOURCE_DIR}/include)
