@@ -30,12 +30,5 @@ target_compile_definitions(qoraal-http PUBLIC CFG_LITTLEFS_DISABLE=1)
 
 
 
-target_link_options(tictactoe PRIVATE
-    "-Wl,--whole-archive"
-    "$<TARGET_FILE:qoraal-engine>"
-    "$<TARGET_FILE:qoraal-tictactoe>"
-    "-Wl,--no-whole-archive"
-)
-
 # Generate a map file
 set_target_properties(tictactoe PROPERTIES LINK_FLAGS "-Wl,-Map=output.map -T ${CMAKE_SOURCE_DIR}/test/posix.ld")
