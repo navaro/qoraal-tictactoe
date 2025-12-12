@@ -22,7 +22,7 @@
 <br>
 <div align="center">
 
-#### Check this out first, then hit me.
+#### Check this out first.
 
 > A demo using the Qoraal Engine to generate HTML via hierarchical state machines, showcasing structured rendering + AI-driven game logic.
 
