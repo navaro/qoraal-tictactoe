@@ -32,8 +32,8 @@ SVC_SERVICE_LIST_END()
 static const QORAAL_CFG_T           _qoraal_cfg = {
     .malloc       = platform_malloc,
     .free         = platform_free,
-    .debug_print  = platform_print,
-    .debug_getch  = platform_getch,
+    .print        = platform_print,
+    .getch        = platform_getch,
     .debug_assert = platform_assert,
     .current_time = platform_current_time,
     .rand         = platform_rand,
