@@ -2,31 +2,127 @@
 
 # Qoraal Tic-Tac-Toe
 
+</div>
+
+**Dynamic HTML generation powered by hierarchical state machines (HSMs).**
+
+This repo is a *working* demo of a slightly unhinged idea that turns out to be extremely clean in practice:
+
+- **The page is rendered by a hierarchical state machine** (not templates, not string soup).
+- **Game logic + AI live in normal C functions**.
+- **HTTP requests trigger events**, and state transitions emit structured HTML.
+
+> The boring version: state-driven rendering for embedded and POSIX.  
+> The fun version: this is what it was all for. Third door on the left, if you dare…
+
 <div align="center">
+  
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&repo=navaro/qoraal-tictactoe)
+![License](https://img.shields.io/github/license/navaro/qoraal-tictactoe)
 
-
-### This is what it all was for. Third door on the left, if you dare...
-
-
-<div align="center">
-
-
-
-<br>
+![Tic-Tac-Toe](./tictactoe.png)
 
 </div>
 
-<div align="center">
-  <img src="tictactoe.png" alt="Welcome" />
-</div>
-<br>
-<div align="center">
 
-#### Check this out first.
+## What you will see
+A web UI served on **port 8080** where:
+
+- you play tic-tac-toe,
+- the AI responds,
+- and the entire HTML response is built by the HSM via `html_emit()` / `html_subst_emit()` actions.
+
+---
+
+## Quick start (Linux / Windows / Codespaces)
+
+### 1) Build
+```bash
+make all
+```
+
+### 2) Run + open the web UI
+When it starts, you’ll see something like:  
+`WSERV : : web server running on port 8080 without SSL!!`
+
+- **Codespaces:** GitHub will offer a forwarded-port link (check the **PORTS** tab).
+- **Local:** open `http://127.0.0.1:8080`
+
+Thats it.
+
+---
+
+## Platforms
+
+### Verified
+- POSIX (Linux/macOS) — built/tested via `make all`
+- Zephyr RTOS (nRF etc.)
+- FreeRTOS
+- ThreadX
+- ChibiOS (discontinued)
+
+> If you run this on a target and it works, drop the board/RTOS + toolchain in an issue/PR and I’ll add it here.
+
+## Networking / IP stacks
+
+### POSIX
+- OS TCP/IP stack (sockets)
+
+### Embedded (depending on platform)
+- Zephyr networking stack (native sockets)
+- ThreadX NetX / NetX Duo (Berkly Socket API)
+- FreeRTOS+TCP (or LWIP, depending on your port)
+
+---
+
+## What is different 
+
+### HSMs map cleanly to HTML structure
+- **Superstates** behave like HTML containers (document → head/body → board → cell).
+- **Enter/exit actions** guarantee tags open/close correctly.
+- **Events** drive the render lifecycle (request → transition → emit → response).
+
+This approach scales weirdly well for embedded systems where you want:
+- deterministic output,
+- tight control over allocations,
+- and a structure that doesnt devolve into spaghetti.
+
+---
+
+## How it works
+
+### The request → render loop
+1. An HTTP request hits the Qoraal HTTP handler.
+2. That triggers an event like `_html_render` / `_tictac_tick`.
+3. The state machine transitions through render states.
+4. Each state emits a chunk of HTML.
+5. The response is sent to the browser.
+
+### Game logic stays normal
+The HSM orchestrates; the game functions do the work:
+- `tictac_play` – apply move, decide AI response
+- `tictac_status` – win/draw/ongoing
+- `tictac_cell` – per-cell state (open / player / AI / blink)
+
+---
+## AI (yes, really)
+On startup the AI loads a model trained over **200,000 iterations** so it’s ready instantly.
+
+You can retrain it from the console:
+```text
+tictactrain x
+```
+Where `x` is the number of training iterations.
+
+---
+
+<div align="center">
+  
+## Now, check this out.
 
 > A demo using the Qoraal Engine to generate HTML via hierarchical state machines, showcasing structured rendering + AI-driven game logic.
 
-<div align="left">
+</div>
 
 
 ```cpp
@@ -159,46 +255,22 @@ statemachine tictactoe {
 }
 ```
 
-## Quick Start  
 
-This demo application can be compiled using the **POSIX port**, allowing you to evaluate it directly in a **GitHub Codespace** or on your PC! For embedded targets, the following RTOS options are supported: **Zephyr, ChibiOS, FreeRTOS, and ThreadX** (provided you have an IP stack like **LwIP** or **NetX**).  
-
-⚠️ **Note:** If running in **GitHub Codespaces**, the application will use **port forwarding**. Once the web server starts on port 8080, you'll get a browser link for accessing the web interface on that port.
-
-### Running on Windows/Linux/Codespace  
-
-1. Open your development environment and clone the repository. If you use a **GitHub Codespace**, the repository is preloaded, just open a terminal (ctrl+`). 
-2. Run the appropriate script based on your OS:  
-
-```sh
-# For Linux, Windows or Codespace:
-$ make all   
-```
-
-3. When the application starts, a shell will open in the terminal, displaying **startup logs**. Look for `WSERV : : web server running on port 8080 without SSL!!`. 
-4. Now you can access the web interface:
-   - In a codespace, click on the link for the forwarded port. This should show in the `PORTS` tab of your terminal.
-   - On your local PC, use **http://127.0.0.1:8080** (or your build machine's local IP if running remotely).
-
-
-That's it, you're up and running! 🚀  Need more options? Check out [Qoraal Http](https://github.com/navaro/qoraal-http) and [Qoraal Engine](https://github.com/navaro/qoraal-engine).
-
-
-On system startup, the Tic-Tac AI initializes with a model trained over 200,000 iterations. The initial model parameters were precomputed and stored to ensure immediate availability at launch.
 
 :bulb: Tip: You can retrain your AI using the console command `tictactrain x`, where `x` is the number of iterations you want to train it for.
 
 So dive in and experience how structured state machines can transform your approach to rendering, interactivity, and even game logic!
 
 
-## Lets get into it
-At its core, a hierarchical state machine is a powerful way to structure logic in a modular, maintainable way. When you use it to render structured text like HTML, you get a flexible method for building dynamic web applications.
 
-The **Qoraal Engine** and **Qoraal HTTP** framework map state transitions directly to HTML rendering, turning what could be a tangle of code into a clear, hierarchical flow. Each state adds a piece of the page, keeping everything neat, scalable, and easy to reason about.
+## Related projects
+- Qoraal HTTP: https://github.com/navaro/qoraal-http  
+- Qoraal Engine: https://github.com/navaro/qoraal-engine
 
-In this Tic-Tac-Toe demo, backend logic and rendering stay tightly connected. Functions like `tictac_play`, `tictac_status`, and `tictac_cell` handle moves and game checks, while `html_ready`, `html_response`, and `html_emit` control the board output. Together, they form a unified system where the engine manages the interaction flow, and the logic drives the game.
+---
 
-With this approach, your web applications get a structured backbone that's easy to extend. Whether you're building dashboards, dynamic content, or even AI-driven interfaces like this game, **Qoraal Engine** turns complexity into a clean, declarative model.
+## License
+MIT — see `LICENSE`.
 
 
 
