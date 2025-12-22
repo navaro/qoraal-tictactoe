@@ -1,6 +1,7 @@
 # Collect all source files
 set(FLASH_SRC
     tictactoe.c
+    services/telnetserver.c
     services/engine.c
     services/wserver_inst.c
     services/html/htmlpart.c

@@ -24,7 +24,7 @@
 
 
 // #include "system_config.h"
-#if 1
+#if defined CFG_OS_ZEPHYR && CFG_OS_ZEPHYR
 
 #include <stdio.h>
 #include <string.h>
@@ -34,7 +34,7 @@
 #include "qoraal/svc/svc_services.h"
 #include "qoraal/svc/svc_shell.h"
 #include "qoraal/svc/svc_logger.h"
-#include "services.h"
+#include "qoraal-tictactoe/services.h"
 
 #define SHELL_PROMPT        "[Qoraal] #> "
 
