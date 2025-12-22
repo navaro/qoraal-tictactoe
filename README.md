@@ -59,18 +59,18 @@ Thats it.
 - Zephyr RTOS (nRF etc.)
 - FreeRTOS
 - ThreadX
-- ChibiOS (discontinued)
+- ChibiOS (legacy)
 
 > If you run this on a target and it works, drop the board/RTOS + toolchain in an issue/PR and I’ll add it here.
 
 ## Networking / IP stacks
 
 ### POSIX
-- OS TCP/IP stack (sockets)
+- OS TCP/IP stack (BSD sockets)
 
 ### Embedded (depending on platform)
-- Zephyr networking stack (native sockets)
-- ThreadX NetX / NetX Duo (Berkly Socket API)
+- Zephyr networking stack
+- ThreadX NetX / NetX Duo (BSD Socket API)
 - FreeRTOS+TCP (or LWIP, depending on your port)
 
 ---
