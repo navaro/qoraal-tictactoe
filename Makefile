@@ -5,7 +5,7 @@ else
 	CMAKE = cmake .. -DBUILD_TICTACTOE_TESTS=ON
 endif
 MKDIR = mkdir -p build
-EXECUTABLE = ./build/test/tictactoe
+EXECUTABLE = ./build/test/posix/tictactoe
 RM = rm -rf
 
 .PHONY: all build run clean

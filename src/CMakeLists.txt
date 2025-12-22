@@ -1,6 +1,5 @@
 # Collect all source files
 set(FLASH_SRC
-    platform.c
     tictactoe.c
     services/engine.c
     services/wserver_inst.c
@@ -12,8 +11,5 @@ set(FLASH_SRC
 # Add the library target
 add_library(qoraal-tictactoe OBJECT ${FLASH_SRC})
 
-# Link necessary libraries
-target_link_libraries(qoraal-tictactoe qoraal-http qoraal-engine)
-
 # Set target include dirs
-target_include_directories(qoraal-http PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(qoraal-http PUBLIC ${CMAKE_CURRENT_LIST_DIR}/../include)

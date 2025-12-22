@@ -13,7 +13,6 @@ FetchContent_Declare(
     SOURCE_SUBDIR  .
 )
 
-
 FetchContent_Declare(
     qoraal_engine
     GIT_REPOSITORY https://github.com/navaro/qoraal-engine.git
@@ -29,6 +28,10 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(qoraal qoraal_engine qoraal_http)
 
+include_directories("${qoraal_SOURCE_DIR}/include")
+include_directories("${qoraal_http_SOURCE_DIR}/include")
+include_directories("${qoraal_engine_SOURCE_DIR}/include")
+
 # Include directories
 include_directories(include)
 
@@ -39,7 +42,7 @@ add_subdirectory(src)
 option(BUILD_TICTACTOE_TESTS "Build the test directory" OFF)
 
 if(BUILD_TICTACTOE_TESTS)
-    add_subdirectory(test)
+    add_subdirectory(test/posix)
 endif()
 
 
