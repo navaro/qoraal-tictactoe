@@ -2,33 +2,24 @@
 
 # Qoraal Tic-Tac-Toe
 
+
+Dynamic HTML generation powered by hierarchical state machines.
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&repo=navaro/qoraal-tictactoe)
+
+![TicTacToe](tictactoe.png)
+
 </div>
 
-**Dynamic HTML generation powered by hierarchical state machines (HSMs).**
 
-This repo is a *working* demo of a slightly unhinged idea that turns out to be extremely clean in practice:
-
+## Why this is different
 - **The page is rendered by a hierarchical state machine** (not templates, not string soup).
 - **Game logic + AI live in normal C functions**.
-- **HTTP requests trigger events**, and state transitions emit structured HTML.
-- **Runtime compilation to a compact IR/bytecode**, or precompiled to keep footprint low.
+- **HTTP requests trigger events**, and transitions **emit structured HTML**.
+- **State machines are compiled from the engine language into a compact runtime form** (tiny footprint).
 
-> The boring version: state-driven rendering for embedded and POSIX.  
-> The fun version: this is what it was all for. Third door on the left, if you dare…
-
-<div align="center">
-  
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&repo=navaro/qoraal-tictactoe)
-![License](https://img.shields.io/github/license/navaro/qoraal-tictactoe)
-
-![Tic-Tac-Toe](./tictactoe.png)
-
-</div>
-
-
-
-
-## Quick start (Linux / Windows / Codespaces)
+## Quick Start (POSIX -- Linux / Windows / Codespaces)
+This demo compiles via the POSIX port, so you can run it locally or in a GitHub Codespace.
 
 ### 1) Build
 ```bash
