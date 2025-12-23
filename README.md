@@ -11,6 +11,7 @@ This repo is a *working* demo of a slightly unhinged idea that turns out to be e
 - **The page is rendered by a hierarchical state machine** (not templates, not string soup).
 - **Game logic + AI live in normal C functions**.
 - **HTTP requests trigger events**, and state transitions emit structured HTML.
+- **Runtime compilation to a compact IR/bytecode**, or precompiled to keep footprint low.
 
 > The boring version: state-driven rendering for embedded and POSIX.  
 > The fun version: this is what it was all for. Third door on the left, if you dare…
