@@ -111,7 +111,7 @@ Where `x` is the number of training iterations.
   
 ## Now, check this out.
 
-> A demo using the Qoraal Engine to generate HTML via hierarchical state machines, showcasing structured rendering + AI-driven game logic.
+> Engine DSL snippet to generate HTML via hierarchical state machines, showcasing structured rendering + AI-driven game logic.
 
 </div>
 
