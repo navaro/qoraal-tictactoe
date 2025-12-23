@@ -14,7 +14,7 @@ Dynamic HTML generation powered by hierarchical state machines.
 - **The page is rendered by a hierarchical state machine** (not templates, not string soup).
 - **Game logic + AI live in normal C functions**.
 - **HTTP requests trigger events**, and transitions **emit structured HTML**.
-- **State machines are compiled from the engine language into a compact runtime form** (tiny footprint).
+- **State machines compile at runtime into compact IR/bytecode (minimal resources), with an optional precompile path to cut runtime cost on constrained targets.** (tiny footprint).
 
 ## Quick Start (POSIX -- Linux / Windows / Codespaces)
 This demo compiles via the POSIX port, so you can run it locally or in a GitHub Codespace.
