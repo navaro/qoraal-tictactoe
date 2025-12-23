@@ -26,14 +26,7 @@ This repo is a *working* demo of a slightly unhinged idea that turns out to be e
 </div>
 
 
-## What you will see
-A web UI served on **port 8080** where:
 
-- you play tic-tac-toe,
-- the AI responds,
-- and the entire HTML response is built by the HSM via `html_emit()` / `html_subst_emit()` actions.
-
----
 
 ## Quick start (Linux / Windows / Codespaces)
 
@@ -43,7 +36,7 @@ make all
 ```
 
 ### 2) Run + open the web UI
-When it starts, you’ll see something like:  
+Tha game will automatically start, you will see the following log:  
 `WSERV : : web server running on port 8080 without SSL!!`
 
 - **Codespaces:** GitHub will offer a forwarded-port link (check the **PORTS** tab).
@@ -51,7 +44,15 @@ When it starts, you’ll see something like:
 
 Thats it.
 
+## What you will see
+A web UI served on **port 8080** where:
+
+- you play tic-tac-toe,
+- the AI responds,
+- and the entire HTML response is built by the HSM via `html_emit()` / `html_subst_emit()` actions.
+
 ---
+
 
 ## Platforms
 
@@ -72,7 +73,7 @@ Thats it.
 ### Embedded (depending on platform)
 - Zephyr networking stack
 - ThreadX NetX / NetX Duo (BSD Socket API)
-- FreeRTOS+TCP (or LWIP, depending on your port)
+- FreeRTOS (LWIP or depending on your port)
 
 ---
 
