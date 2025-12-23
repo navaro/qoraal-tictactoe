@@ -248,9 +248,8 @@ statemachine tictactoe {
 
 
 
-:bulb: Tip: You can retrain your AI using the console command `tictactrain x`, where `x` is the number of iterations you want to train it for.
 
-So dive in and experience how structured state machines can transform your approach to rendering, interactivity, and even game logic!
+:bulb: So dive in and experience how structured state machines can transform your approach to rendering, interactivity, and even game logic!
 
 
 
