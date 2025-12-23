@@ -255,6 +255,7 @@ So dive in and experience how structured state machines can transform your appro
 
 
 ## Related projects
+- Qoraal: https://github.com/navaro/qoraal 
 - Qoraal HTTP: https://github.com/navaro/qoraal-http  
 - Qoraal Engine: https://github.com/navaro/qoraal-engine
 
