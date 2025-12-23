@@ -2,7 +2,6 @@
 
 # Qoraal Tic-Tac-Toe
 
-
 Dynamic HTML generation powered by hierarchical state machines.
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&repo=navaro/qoraal-tictactoe)
@@ -10,7 +9,6 @@ Dynamic HTML generation powered by hierarchical state machines.
 ![TicTacToe](tictactoe.png)
 
 </div>
-
 
 ## Why this is different
 - **The page is rendered by a hierarchical state machine** (not templates, not string soup).
