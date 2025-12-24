@@ -6,3 +6,4 @@ output.map
 
 
 test/zephyr/zephyr.code-workspace
+test/zephyr/secrets.conf
