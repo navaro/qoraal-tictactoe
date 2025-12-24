@@ -2,28 +2,36 @@
 
 # Qoraal Tic-Tac-Toe
 
+Dynamic HTML generation powered by hierarchical state machines.
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&repo=navaro/qoraal-tictactoe)
+
+![TicTacToe](tictactoe.png)
+
 </div>
 
-**Dynamic HTML generation powered by hierarchical state machines (HSMs).**
-
-This repo is a *working* demo of a slightly unhinged idea that turns out to be extremely clean in practice:
-
+## Why this is different
 - **The page is rendered by a hierarchical state machine** (not templates, not string soup).
 - **Game logic + AI live in normal C functions**.
-- **HTTP requests trigger events**, and state transitions emit structured HTML.
+- **HTTP requests trigger events**, and transitions **emit structured HTML**.
+- **State machines compile at runtime into compact IR/bytecode (minimal resources), with an optional precompile path to cut runtime cost on constrained targets.** (tiny footprint).
 
-> The boring version: state-driven rendering for embedded and POSIX.  
-> The fun version: this is what it was all for. Third door on the left, if you dare…
+## Quick Start (POSIX -- Linux / Windows / Codespaces)
+This demo compiles via the POSIX port, so you can run it locally or in a GitHub Codespace.
 
-<div align="center">
-  
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&repo=navaro/qoraal-tictactoe)
-![License](https://img.shields.io/github/license/navaro/qoraal-tictactoe)
+### 1) Build
+```bash
+make all
+```
 
-![Tic-Tac-Toe](./tictactoe.png)
+### 2) Run + open the web UI
+Tha game will automatically start, you will see the following log:  
+`WSERV : : web server running on port 8080 without SSL!!`
 
-</div>
+- **Codespaces:** GitHub will offer a forwarded-port link (check the **PORTS** tab).
+- **Local:** open `http://127.0.0.1:8080`
 
+Thats it.
 
 ## What you will see
 A web UI served on **port 8080** where:
@@ -34,23 +42,6 @@ A web UI served on **port 8080** where:
 
 ---
 
-## Quick start (Linux / Windows / Codespaces)
-
-### 1) Build
-```bash
-make all
-```
-
-### 2) Run + open the web UI
-When it starts, you’ll see something like:  
-`WSERV : : web server running on port 8080 without SSL!!`
-
-- **Codespaces:** GitHub will offer a forwarded-port link (check the **PORTS** tab).
-- **Local:** open `http://127.0.0.1:8080`
-
-Thats it.
-
----
 
 ## Platforms
 
@@ -71,7 +62,7 @@ Thats it.
 ### Embedded (depending on platform)
 - Zephyr networking stack
 - ThreadX NetX / NetX Duo (BSD Socket API)
-- FreeRTOS+TCP (or LWIP, depending on your port)
+- FreeRTOS (LWIP or depending on your port)
 
 ---
 
@@ -120,7 +111,7 @@ Where `x` is the number of training iterations.
   
 ## Now, check this out.
 
-> A demo using the Qoraal Engine to generate HTML via hierarchical state machines, showcasing structured rendering + AI-driven game logic.
+> Engine DSL snippet to generate HTML via hierarchical state machines, showcasing structured rendering + AI-driven game logic.
 
 </div>
 
@@ -257,13 +248,13 @@ statemachine tictactoe {
 
 
 
-:bulb: Tip: You can retrain your AI using the console command `tictactrain x`, where `x` is the number of iterations you want to train it for.
 
-So dive in and experience how structured state machines can transform your approach to rendering, interactivity, and even game logic!
+:bulb: So dive in and experience how structured state machines can transform your approach to rendering, interactivity, and even game logic!
 
 
 
 ## Related projects
+- Qoraal: https://github.com/navaro/qoraal 
 - Qoraal HTTP: https://github.com/navaro/qoraal-http  
 - Qoraal Engine: https://github.com/navaro/qoraal-engine
 
