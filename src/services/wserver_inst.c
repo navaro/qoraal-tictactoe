@@ -41,7 +41,9 @@
 #include "qoraal-http/example/wimage.h"
 #include "qoraal-tictactoe/wserver_inst.h"
 #include "html/wengine.h"
-
+#if !defined(CFG_HTTPSERVER_TLS_DISABLE) || !CFG_HTTPSERVER_TLS_DISABLE
+#include "qoraal-http/mbedtls/mbedtlsutils.h"
+#endif
 
 static int32_t      wserver_init (uintptr_t arg) ;
 static int32_t      wserver_start (uintptr_t port) ;
@@ -299,18 +301,28 @@ wserver_authenticate (const char * user, const char * passwd)
 int32_t
 wserver_start (uintptr_t arg)
 {
+    uint32_t port = (uint32_t) (arg);
+    void * ssl =  NULL ;
+#if !defined(CFG_HTTPSERVER_TLS_DISABLE) || !CFG_HTTPSERVER_TLS_DISABLE
+    if (port & WSERVER_SSL) {
+        ssl = mbedtlsutils_get_server_config () ;
+    }
+#endif    
+    port &= WSERVER_PORT_MASK ;
+
+    if (port == 0) {
 #if defined CFG_OS_POSIX
-    uint32_t port = 8000 ; 
-#else
-    uint32_t port = 0 ;
+        port = 8000 ; 
 #endif
 #if defined CFG_HTTPSERVER_TLS_DISABLE && CFG_HTTPSERVER_TLS_DISABLE
-    port += 80 ;
+        port += 80 ;
 #else
-    port += 443;
+        port += 443;
 #endif
 
-    bool ssl = false ; // registry_get ("www.ssl", false) ;
+
+    }
+
 
     static const WSERVER_FRAMEWORK wserver_std_headers[] = {
             wserver_header_start,

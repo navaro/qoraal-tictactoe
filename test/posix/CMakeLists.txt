@@ -13,7 +13,9 @@ target_compile_definitions(qoraal-http PRIVATE CFG_OS_POSIX
                                 CFG_HTTPCLIENT_TLS_DISABLE=1)
 target_compile_definitions(qoraal-tictactoe PRIVATE CFG_OS_POSIX
                                 CFG_HTTPSERVER_TLS_DISABLE=1)
-target_compile_definitions(tictactoe PRIVATE CFG_OS_POSIX)
+target_compile_definitions(tictactoe PRIVATE CFG_OS_POSIX
+                                CFG_HTTPSERVER_TLS_DISABLE=1)
+
 
 target_compile_options(tictactoe PRIVATE -O0 -g)
 target_compile_options(qoraal PRIVATE -O0 -g)

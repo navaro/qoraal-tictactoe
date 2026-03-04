@@ -35,6 +35,7 @@ LOG_MODULE_REGISTER(sta, CONFIG_LOG_DEFAULT_LEVEL);
 #include <zephyr/net/net_event.h>
 #include <zephyr/drivers/gpio.h>
 
+#include <zephyr/console/console.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -52,10 +53,20 @@ LOG_MODULE_REGISTER(sta, CONFIG_LOG_DEFAULT_LEVEL);
 #include <pm_config.h>
 
 #include "qoraal/qoraal.h"
-#include "qoraal-http/qoraal.h"
 #include "qoraal/svc/svc_services.h"
+#include "qoraal/svc/svc_shell.h"
 #include "qoraal/platform.h"
 #include "qoraal/qshell/console.h"
+#include "qoraal-http/qoraal.h"
+#include "qoraal-http/mbedtls/mbedtlsutils.h"
+
+#include <zephyr/net/net_if.h>
+#include <zephyr/net/net_ip.h>
+#include <zephyr/net/dhcpv4.h>
+
+#define 	WIFI_STATIC_IPV4_ADDR       "192.168.1.99"
+#define  	WIFI_STATIC_IPV4_NETMASK    "255.255.255.0"
+#define  	WIFI_STATIC_IPV4_GW         "192.168.1.1"
 
 
 #if !IS_ENABLED(CONFIG_PARTITION_MANAGER_ENABLED)
@@ -67,7 +78,7 @@ LOG_MODULE_REGISTER(sta, CONFIG_LOG_DEFAULT_LEVEL);
 static void wifi_ready_cb(bool wifi_ready);
 static void wifi_mgmt_event_handler(struct net_mgmt_event_callback *cb, uint32_t mgmt_event, struct net_if *iface) ;
 static void net_mgmt_event_handler(struct net_mgmt_event_callback *cb, uint32_t mgmt_event, struct net_if *iface) ;
-static void main_init (void) ;
+
 
 static void wifi_connect_work_handler(struct k_work *work) ;
 #define WIFI_WQ_STACK_SIZE 8192
@@ -155,7 +166,7 @@ platform_init_wifi (void)
 
 	if (!iface) {
 		LOG_ERR("Failed to get Wi-Fi interface");
-		return -1;
+		return ;
 	}
 
 	cb.wifi_ready_cb = wifi_ready_cb;
@@ -164,7 +175,7 @@ platform_init_wifi (void)
 	rc = register_wifi_ready_callback(cb, iface);
 	if (rc) {
 		LOG_ERR("Failed to register Wi-Fi ready callbacks %s", strerror(rc));
-		return rc;
+		return ;
 	}
 
 
@@ -179,6 +190,9 @@ platform_init(uint32_t flash_size)
 {
     _platform_flash_size = flash_size;
     console_init();
+#if !defined(CFG_HTTPCLIENT_TLS_DISABLE) || !CFG_HTTPCLIENT_TLS_DISABLE
+    mbedtlsutils_init();
+#endif
     return 0;
 }
 
@@ -186,7 +200,12 @@ int32_t
 platform_start(void)
 {
     ARG_UNUSED(_platform_flash_size);
+#if !defined(CFG_HTTPCLIENT_TLS_DISABLE) || !CFG_HTTPCLIENT_TLS_DISABLE
+    mbedtlsutils_start( 0 ) ;
+#endif
     platform_init_wifi();
+
+    
     return 0;
 }
 
@@ -410,6 +429,218 @@ static void net_mgmt_event_handler(struct net_mgmt_event_callback *cb,
 	break;
 	}
 }
+
+
+static int32_t
+qshell_wifi (SVC_SHELL_IF_T * pif, char** argv, int argc)
+{
+
+    svc_shell_print (pif, SVC_SHELL_OUT_STD,
+                "WiFi Status:\r\n") ;
+
+	struct net_if *iface = net_if_get_default();
+	struct wifi_iface_status status = { 0 };
+
+	if (net_mgmt(NET_REQUEST_WIFI_IFACE_STATUS, iface, &status,
+				sizeof(struct wifi_iface_status))) {
+		svc_shell_print(pif, SVC_SHELL_OUT_STD,
+            "Status request failed");
+
+		return -ENOEXEC;
+	}
+
+	svc_shell_print(pif, SVC_SHELL_OUT_STD,
+            "==================");
+	svc_shell_print(pif, SVC_SHELL_OUT_STD,
+            "State: %s", wifi_state_txt(status.state));
+
+	if (status.state >= WIFI_STATE_ASSOCIATED) {
+		uint8_t mac_string_buf[sizeof("xx:xx:xx:xx:xx:xx")];
+
+		svc_shell_print(pif, SVC_SHELL_OUT_STD,
+            "Interface Mode: %s",
+		       wifi_mode_txt(status.iface_mode));
+		svc_shell_print(pif, SVC_SHELL_OUT_STD,
+            "Link Mode: %s",
+		       wifi_link_mode_txt(status.link_mode));
+		svc_shell_print(pif, SVC_SHELL_OUT_STD,
+            "SSID: %.32s", status.ssid);
+		svc_shell_print(pif, SVC_SHELL_OUT_STD,
+            "BSSID: %s",
+		       net_sprint_ll_addr_buf(
+				status.bssid, WIFI_MAC_ADDR_LEN,
+				mac_string_buf, sizeof(mac_string_buf)));
+		svc_shell_print(pif, SVC_SHELL_OUT_STD,
+            "Band: %s", wifi_band_txt(status.band));
+		svc_shell_print(pif, SVC_SHELL_OUT_STD,
+            "Channel: %d", status.channel);
+		svc_shell_print(pif, SVC_SHELL_OUT_STD,
+            "Security: %s", wifi_security_txt(status.security));
+		svc_shell_print(pif, SVC_SHELL_OUT_STD,
+            "MFP: %s", wifi_mfp_txt(status.mfp));
+		svc_shell_print(pif, SVC_SHELL_OUT_STD,
+            "RSSI: %d", status.rssi);
+	}
+
+    return SVC_SHELL_CMD_E_OK ;
+
+}
+SVC_SHELL_CMD_DECL("wifi", qshell_wifi, "");
+
+
+
+static int32_t
+print_ip(SVC_SHELL_IF_T *pif)
+{
+    struct net_if *iface = net_if_get_first_wifi();
+    struct net_if_ipv4 *ipv4;
+    char ip_buf[NET_IPV4_ADDR_LEN];
+    char nm_buf[NET_IPV4_ADDR_LEN];
+    char gw_buf[NET_IPV4_ADDR_LEN];
+
+    if (!iface) {
+        svc_shell_print(pif, SVC_SHELL_OUT_STD,
+                        "No Wi-Fi interface found\r\n");
+        return SVC_SHELL_CMD_E_FAIL;
+    }
+
+    ipv4 = iface->config.ip.ipv4;
+    if (!ipv4) {
+        svc_shell_print(pif, SVC_SHELL_OUT_STD,
+                        "IPv4 not enabled on interface\r\n");
+        return SVC_SHELL_CMD_E_FAIL;
+    }
+
+    /* Find first used unicast IPv4 address */
+    for (int i = 0; i < NET_IF_MAX_IPV4_ADDR; i++) {
+        if (ipv4->unicast[i].ipv4.is_used) {
+
+            net_addr_ntop(AF_INET,
+                          &ipv4->unicast[i].ipv4.address.in_addr,
+                          ip_buf, sizeof(ip_buf));
+
+            net_addr_ntop(AF_INET,
+                          &ipv4->unicast[i].netmask,
+                          nm_buf, sizeof(nm_buf));
+
+            net_addr_ntop(AF_INET,
+                          &ipv4->gw,
+                          gw_buf, sizeof(gw_buf));
+
+            svc_shell_print(pif, SVC_SHELL_OUT_STD,
+                            "IP: %s\r\nNetmask: %s\r\nGateway: %s\r\n",
+                            ip_buf, nm_buf, gw_buf);
+
+            return SVC_SHELL_CMD_E_OK;
+        }
+    }
+
+    svc_shell_print(pif, SVC_SHELL_OUT_STD,
+                    "No IPv4 address assigned\r\n");
+    return SVC_SHELL_CMD_E_FAIL;
+}
+
+
+
+static int32_t
+qshell_ifconfig(SVC_SHELL_IF_T *pif, char **argv, int argc)
+{
+    struct net_if *iface = net_if_get_first_wifi();
+    struct in_addr ip, nm, gw;
+
+    const char *ip_s = WIFI_STATIC_IPV4_ADDR;
+    const char *nm_s = WIFI_STATIC_IPV4_NETMASK;
+    const char *gw_s = WIFI_STATIC_IPV4_GW;
+
+    char gw_buf[NET_IPV4_ADDR_LEN];
+
+    if (!iface) {
+        svc_shell_print(pif, SVC_SHELL_OUT_STD,
+                        "No Wi-Fi interface found\r\n");
+        return SVC_SHELL_CMD_E_FAIL;
+    }
+
+    /* Usage */
+    if (argc < 2) {
+        svc_shell_print(pif, SVC_SHELL_OUT_STD,
+                        "Usage:\r\n"
+                        "  ifconfig <ip> [netmask] [gateway]\r\n"
+                        "\r\n");
+
+        return print_ip (pif) ;
+    }
+
+    /* argv[0] is command name, argv[1..] are args */
+    if (argc >= 2) ip_s = argv[1];
+    if (argc >= 3) nm_s = argv[2];
+    if (argc >= 4) gw_s = argv[3]; /* explicit gateway provided */
+
+    if (net_addr_pton(AF_INET, ip_s, &ip)) {
+        LOG_ERR("Bad static IP: %s", ip_s);
+        return -EINVAL;
+    }
+
+    if (net_addr_pton(AF_INET, nm_s, &nm)) {
+        LOG_ERR("Bad netmask: %s", nm_s);
+        return -EINVAL;
+    }
+
+    /* If gateway not specified, derive it as network + 1 */
+    if (argc < 4) {
+        uint32_t ip_h = ntohl(ip.s_addr);
+        uint32_t nm_h = ntohl(nm.s_addr);
+
+        uint32_t net_h = ip_h & nm_h;
+        uint32_t gw_h  = net_h + 1U;
+
+        gw.s_addr = htonl(gw_h);
+
+        /* for logging/printing */
+        if (!net_addr_ntop(AF_INET, &gw, gw_buf, sizeof(gw_buf))) {
+            LOG_ERR("Failed to format derived gateway");
+            return -EIO;
+        }
+        gw_s = gw_buf;
+    } else {
+    if (net_addr_pton(AF_INET, gw_s, &gw)) {
+        LOG_ERR("Bad gateway: %s", gw_s);
+        return -EINVAL;
+    }
+    }
+
+    /* Make sure DHCP isn't racing you */
+#if IS_ENABLED(CONFIG_NET_DHCPV4)
+    net_dhcpv4_stop(iface);
+#endif
+
+    /* Optional: clear old addresses */
+    struct net_if_ipv4 *ipv4 = iface->config.ip.ipv4;
+    if (ipv4) {
+        for (int i = 0; i < NET_IF_MAX_IPV4_ADDR; i++) {
+            if (ipv4->unicast[i].ipv4.is_used) {
+                net_if_ipv4_addr_rm(iface, &ipv4->unicast[i].ipv4.address.in_addr);
+            }
+        }
+    }
+
+    net_if_ipv4_set_netmask(iface, &nm);
+    net_if_ipv4_set_gw(iface, &gw);
+
+    struct net_if_addr *ifaddr = net_if_ipv4_addr_add(iface, &ip, NET_ADDR_MANUAL, 0);
+    if (!ifaddr) {
+        LOG_ERR("Failed to add static IPv4 address");
+        return -ENOMEM;
+    }
+
+    LOG_INF("Static IPv4 set: %s / %s gw %s", ip_s, nm_s, gw_s);
+
+    svc_shell_print(pif, SVC_SHELL_OUT_STD,
+                    "OK: IP=%s Netmask=%s Gateway=%s\r\n",
+                    ip_s, nm_s, gw_s);
+
+    return SVC_SHELL_CMD_E_OK;
+}
+SVC_SHELL_CMD_DECL("ifconfig", qshell_ifconfig, "");
 
 
 #endif /* CFG_OS_ZEPHYR */
